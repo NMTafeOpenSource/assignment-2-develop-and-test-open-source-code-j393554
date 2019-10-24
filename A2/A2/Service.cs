@@ -12,16 +12,18 @@ namespace A2
 
     private int lastServiceOdometerKm = 0;
     private int serviceCount = 0;
-    // TODO add lastServiceDate
+    private Nullable<DateTime> lastServiceDate = null;
+
 
     public int getLastServiceOdometerKm()
     {
       return this.lastServiceOdometerKm;
     }
 
-    public void recordService(int distance)
+    public void recordService( int distance, DateTime serviceDate )
     {
       this.lastServiceOdometerKm = distance;
+      this.lastServiceDate = serviceDate;
       this.serviceCount++;
     }
 
@@ -32,7 +34,7 @@ namespace A2
 
     public int getTotalScheduledServices()
     {
-      return this.lastServiceOdometerKm / SERVICE_KILOMETER_LIMIT;
+      return (int) this.lastServiceOdometerKm / SERVICE_KILOMETER_LIMIT;
     }
   }
 }

@@ -8,32 +8,35 @@ namespace A2
 {
   class Vehicle
   {
-    private string manufacturer;
-    private string model;
-    private int makeYear;
-    // TODO add Registration Number 
-    // TODO add variable for OdometerReading (in KM), 
-    // TODO add variable for TankCapacity (in litres)
-
+    public string manufacturer { get; private set; }
+    public string model { get; private set; }
+    public int makeYear { get; private set; }
+    public string registrationNumber { get; private set; }
+    public double tankCapacity { get; private set; }
+    public int odometer { get; private set; }
     private FuelPurchase fuelPurchase;
 
-    public Vehicle(string manufacturer, string model, int makeYear)
+    public Vehicle(string manufacturer, string model, int makeYear, string registrationNumber, double tankCapacity, int odometer = 0 )
     {
       this.manufacturer = manufacturer;
       this.model = model;
       this.makeYear = makeYear;
+      this.registrationNumber = registrationNumber;
+      this.tankCapacity = tankCapacity;
+      this.odometer = odometer;
       this.fuelPurchase = new FuelPurchase();
     }
 
-    // TODO Add missing getter and setter methods
-    public void printDetails()
+    public void addDistance( int kilometers )
     {
-      Console.WriteLine("Vehicle: " + makeYear + " " + manufacturer + " " + model);
-      // TODO Display additional information about this vehicle
+      this.odometer += kilometers;
     }
 
-    // TODO Create an addKilometers method which takes a parameter for distance travelled and adds it to the odometer reading. 
-    // adds fuel to the car
+    public void setOdometer( int kilometers )
+    {
+      this.odometer = kilometers;
+    }
+
     public void addFuel(double litres, double price)
     {
       this.fuelPurchase.purchaseFuel(litres, price);
