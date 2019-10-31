@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace A2
 {
-  class Service
+  public class Service
   {
     public const int SERVICE_KILOMETER_LIMIT = 10000;
 
@@ -15,26 +15,26 @@ namespace A2
     private Nullable<DateTime> lastServiceDate = null;
 
 
-    public int getLastServiceOdometerKm()
+    public int GetLastServiceOdometerKm()
     {
-      return this.lastServiceOdometerKm;
+      return lastServiceOdometerKm;
     }
 
-    public void recordService( int distance, DateTime serviceDate )
+    public void RecordService( int distance, DateTime serviceDate )
     {
-      this.lastServiceOdometerKm = distance;
-      this.lastServiceDate = serviceDate;
-      this.serviceCount++;
+      lastServiceOdometerKm = distance;
+      lastServiceDate = serviceDate;
+      serviceCount++;
     }
 
-    public int getServiceCount()
+    public int GetServiceCount()
     {
-      return this.serviceCount;
+      return serviceCount;
     }
 
-    public int getTotalScheduledServices()
+    public int GetTotalScheduledServices()
     {
-      return (int) this.lastServiceOdometerKm / SERVICE_KILOMETER_LIMIT;
+      return lastServiceOdometerKm / SERVICE_KILOMETER_LIMIT;
     }
   }
 }

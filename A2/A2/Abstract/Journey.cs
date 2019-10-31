@@ -6,23 +6,23 @@ using System.Threading.Tasks;
 
 namespace A2
 {
-  class Journey
+  public class Journey
   {
-    private double kilometers;
+    private int kilometers;
 
-    public Journey()
+    public Journey( int kilometers = 0 )
     {
-      this.kilometers = 0;
+      this.kilometers = kilometers;
     }
 
-    public void addKilometers(double kilometers)
+    public void AddKilometers( int kilometers )
     {
       this.kilometers += kilometers;
     }
 
-    public double getKilometers()
+    public int GetKilometers()
     {
-      return this.kilometers;
+      return kilometers;
     }
   }
 }

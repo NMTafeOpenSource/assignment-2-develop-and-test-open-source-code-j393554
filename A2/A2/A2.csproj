@@ -55,9 +55,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="MainWindowViewModel.cs" />
-    <Compile Include="Service.cs" />
-    <Compile Include="Vehicle.cs" />
+    <Compile Include="FuelPurchasesWindow.xaml.cs">
+      <DependentUpon>FuelPurchasesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="abstract\Service.cs" />
+    <Compile Include="Journeys.xaml.cs">
+      <DependentUpon>Journeys.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ServicesWindow.xaml.cs">
+      <DependentUpon>ServicesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="abstract\Vehicle.cs" />
+    <Page Include="FuelPurchasesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Journeys.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -66,12 +82,16 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FuelPurchase.cs" />
-    <Compile Include="Journey.cs" />
+    <Compile Include="abstract\FuelPurchase.cs" />
+    <Compile Include="abstract\Journey.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ServicesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

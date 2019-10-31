@@ -6,40 +6,57 @@ using System.Threading.Tasks;
 
 namespace A2
 {
-  class Vehicle
+  public class Vehicle
   {
-    public string manufacturer { get; private set; }
-    public string model { get; private set; }
-    public int makeYear { get; private set; }
-    public string registrationNumber { get; private set; }
-    public double tankCapacity { get; private set; }
-    public int odometer { get; private set; }
-    private FuelPurchase fuelPurchase;
+    public string Manufacturer { get; private set; }
+    public string Model { get; private set; }
+    public int MakeYear { get; private set; }
+    public string RegistrationNumber { get; private set; }
+    public double TankCapacity { get; private set; }
+    public int Odometer { get; private set; }
+    private readonly FuelPurchase fuelPurchase;
 
-    public Vehicle(string manufacturer, string model, int makeYear, string registrationNumber, double tankCapacity, int odometer = 0 )
+    public Vehicle(
+      string manufacturer,
+      string model,
+      int makeYear,
+      string registrationNumber,
+      double tankCapacity,
+      int odometer = 0
+    )
     {
-      this.manufacturer = manufacturer;
-      this.model = model;
-      this.makeYear = makeYear;
-      this.registrationNumber = registrationNumber;
-      this.tankCapacity = tankCapacity;
-      this.odometer = odometer;
-      this.fuelPurchase = new FuelPurchase();
+      Manufacturer = manufacturer;
+      Model = model;
+      MakeYear = makeYear;
+      RegistrationNumber = registrationNumber;
+      TankCapacity = tankCapacity;
+      Odometer = odometer;
+      fuelPurchase = new FuelPurchase();
     }
 
-    public void addDistance( int kilometers )
+    public void AddDistance( int kilometers )
     {
-      this.odometer += kilometers;
+      Odometer += kilometers;
     }
 
-    public void setOdometer( int kilometers )
+    public void SetOdometer( int kilometers )
     {
-      this.odometer = kilometers;
+      Odometer = kilometers;
     }
 
-    public void addFuel(double litres, double price)
+    public void AddFuel(double litres, double price)
     {
-      this.fuelPurchase.purchaseFuel(litres, price);
+      fuelPurchase.PurchaseFuel(litres, price);
+    }
+
+    public double GetFuelLitres()
+    {
+      return fuelPurchase.GetFuel();
+    }
+
+    public double GetFuelCost()
+    {
+      return fuelPurchase.GetCost();
     }
   }
 }

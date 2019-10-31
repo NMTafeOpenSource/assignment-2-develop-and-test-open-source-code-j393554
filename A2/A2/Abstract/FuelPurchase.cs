@@ -6,31 +6,36 @@ using System.Threading.Tasks;
 
 namespace A2
 {
-  class FuelPurchase
+  public class FuelPurchase
   {
     private double fuelEconomy;
     private double litres = 0;
     private double cost = 0;
 
-    public double getFuelEconomy()
+    public double GetFuelEconomy()
     {
       return fuelEconomy;
     }
 
-    public double getFuel()
-    {
-      return this.litres;
-    }
-
-    public void setFuelEconomy(double fuelEconomy)
+    public void SetFuelEconomy(double fuelEconomy)
     {
       this.fuelEconomy = fuelEconomy;
     }
 
-    public void purchaseFuel(double amount, double price)
+    public double GetFuel()
     {
-      this.litres += amount;
-      this.cost += price;
+      return litres;
+    }
+
+    public double GetCost()
+    {
+      return cost;
+    }
+
+    public void PurchaseFuel(double amount, double price)
+    {
+      litres += amount;
+      cost += price;
     }
   }
 }
