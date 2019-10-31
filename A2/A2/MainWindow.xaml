@@ -6,7 +6,39 @@
         xmlns:local="clr-namespace:A2"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="3*"/>
+      <ColumnDefinition Width="2*"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="2*"/>
+      <RowDefinition Height="2*"/>
+      <RowDefinition Height="2*"/>
+      <RowDefinition/>
+      <RowDefinition/>
+    </Grid.RowDefinitions>
+    <ListView HorizontalAlignment="Left" Height="347" Margin="10,10,0,0" VerticalAlignment="Top" Width="455" Grid.RowSpan="4">
+      <ListView.View>
+        <GridView>
+          <GridViewColumn Header="Manufacturer" Width="80" />
+          <GridViewColumn Header="Model" Width="80" />
+          <GridViewColumn Header="Registration" Width="80" />
+        </GridView>
+      </ListView.View>
+    </ListView>
+    <GroupBox Header="Vehicle Information" HorizontalAlignment="Left" Height="85" Margin="10,10,0,0" VerticalAlignment="Top" Width="297" Grid.Column="1">
+      <Grid/>
+    </GroupBox>
+    <GroupBox Header="Recent Journey" HorizontalAlignment="Left" Height="85" Margin="10,10,0,0" VerticalAlignment="Top" Width="297" Grid.Column="1" Grid.Row="1">
+      <Grid/>
+    </GroupBox>
+    <GroupBox Header="Recent Fuel Purchase" HorizontalAlignment="Left" Height="85" Margin="10,10,0,0" VerticalAlignment="Top" Width="297" Grid.Row="2" Grid.Column="1">
+      <Grid/>
+    </GroupBox>
+    <GroupBox Header="Recent Service" HorizontalAlignment="Left" Height="85" Margin="10,10,0,0" VerticalAlignment="Top" Width="297" Grid.Row="3" Grid.Column="1" Grid.RowSpan="2">
+      <Grid/>
+    </GroupBox>
+    <Button Content="Button" HorizontalAlignment="Left" Margin="10,10,0,0" Grid.Row="4" VerticalAlignment="Top" Width="75"/>
+  </Grid>
 </Window>

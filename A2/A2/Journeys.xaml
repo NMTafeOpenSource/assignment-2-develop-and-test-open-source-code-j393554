@@ -1,0 +1,56 @@
+﻿<Window x:Class="A2.Journeys"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:A2"
+        mc:Ignorable="d"
+        Title="Journeys" Height="450" Width="400">
+  <Grid>
+    <ListView HorizontalAlignment="Left" Height="163" Margin="10,10,0,0" VerticalAlignment="Top" Width="372">
+      <ListView.View>
+        <GridView>
+          <GridViewColumn Header="Start Date" Width="80" />
+          <GridViewColumn Header="End Date" Width="80" />
+          <GridViewColumn Header="Start KM" Width="80" />
+          <GridViewColumn Header="End KM" Width="80" />
+        </GridView>
+      </ListView.View>
+    </ListView>
+    <Button Content="Add" HorizontalAlignment="Left" Margin="10,388,0,0" VerticalAlignment="Top" Width="75"/>
+    <Button Content="Save" HorizontalAlignment="Left" Margin="227,388,0,0" VerticalAlignment="Top" Width="75"/>
+    <Button Content="Delete" HorizontalAlignment="Left" Margin="307,388,0,0" VerticalAlignment="Top" Width="75"/>
+    <GroupBox Header="Date" HorizontalAlignment="Left" Height="100" Margin="10,178,0,0" VerticalAlignment="Top" Width="372">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition/>
+          <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="3*"/>
+          <ColumnDefinition Width="7*"/>
+        </Grid.ColumnDefinitions>
+        <Label Content="Start" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26" Width="35"/>
+        <DatePicker HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Grid.Column="1" Height="24" Width="232"/>
+        <Label Content="End" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26" Width="35" Grid.Row="1"/>
+        <DatePicker HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Grid.Column="1" Height="24" Width="232" Grid.Row="1"/>
+      </Grid>
+    </GroupBox>
+    <GroupBox Header="Odometer" HorizontalAlignment="Left" Height="100" Margin="10,283,0,0" VerticalAlignment="Top" Width="372">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition/>
+          <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="3*"/>
+          <ColumnDefinition Width="7*"/>
+        </Grid.ColumnDefinitions>
+        <Label Content="Start" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26" Width="35"/>
+        <Label Content="End" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="26" Width="35" Grid.Row="1"/>
+        <TextBox Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="232"/>
+        <TextBox Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="232" Grid.Row="1"/>
+      </Grid>
+    </GroupBox>
+  </Grid>
+</Window>
