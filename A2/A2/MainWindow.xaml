@@ -18,12 +18,12 @@
       <RowDefinition/>
       <RowDefinition/>
     </Grid.RowDefinitions>
-    <ListView HorizontalAlignment="Left" Height="347" Margin="10,10,0,0" VerticalAlignment="Top" Width="455" Grid.RowSpan="4">
+    <ListView HorizontalAlignment="Left" Height="347" Margin="10,10,0,0" VerticalAlignment="Top" Width="455" Grid.RowSpan="4" ItemsSource="{Binding Vehicles}">
       <ListView.View>
         <GridView>
-          <GridViewColumn Header="Manufacturer" Width="80" />
-          <GridViewColumn Header="Model" Width="80" />
-          <GridViewColumn Header="Registration" Width="80" />
+          <GridViewColumn Header="Manufacturer" DisplayMemberBinding="{Binding Manufacturer}" Width="80" />
+          <GridViewColumn Header="Model" DisplayMemberBinding="{Binding Model}" Width="80" />
+          <GridViewColumn Header="Registration" DisplayMemberBinding="{Binding RegistrationNumber}" Width="80" />
         </GridView>
       </ListView.View>
     </ListView>
