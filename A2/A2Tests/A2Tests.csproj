@@ -56,10 +56,10 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="abstract\FuelPurchaseTests.cs" />
-    <Compile Include="abstract\JourneyTests.cs" />
-    <Compile Include="abstract\ServiceTests.cs" />
-    <Compile Include="abstract\VehicleTests.cs" />
+    <Compile Include="Model\FuelPurchaseTests.cs" />
+    <Compile Include="Model\JourneyTests.cs" />
+    <Compile Include="Model\ServiceTests.cs" />
+    <Compile Include="Model\VehicleTests.cs" />
     <Compile Include="mock\FuelPurchaseMock.cs" />
     <Compile Include="mock\JourneyMock.cs" />
     <Compile Include="mock\ServiceMock.cs" />

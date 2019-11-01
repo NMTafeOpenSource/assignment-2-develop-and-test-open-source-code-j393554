@@ -1,0 +1,176 @@
+﻿<Window x:Class="A2.VehicleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:A2"
+        mc:Ignorable="d"
+        Title="Vehicle" Height="450" Width="800" Loaded="Window_Loaded" Closed="Window_Closed">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="6*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="10"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="10*"/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock x:Name="tbName" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Name, FallbackValue='Untitled Vehicle'}" VerticalAlignment="Stretch" FontSize="20" />
+        <TextBlock Grid.Column="4" HorizontalAlignment="Right" Margin="0,10,8,10" Grid.Row="1" TextWrapping="Wrap" Text="{Binding RegistrationNumber, FallbackValue='(No Registration)'}" VerticalAlignment="Stretch" FontSize="20" />
+        <TextBlock x:Name="tbOdometer" Grid.Column="3" HorizontalAlignment="Right" Margin="0,10,10,10" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Stretch" FontSize="20" />
+
+        <GroupBox Grid.Column="1" Header="Information" Grid.Row="2">
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4*"/>
+                    <ColumnDefinition Width="6*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <Label HorizontalAlignment="Left" Margin="10,0" Content="Manufacturer" VerticalAlignment="Center"/>
+                <TextBox x:Name="tbManufacturer" Text="{Binding Manufacturer, FallbackValue='-'}" HorizontalAlignment="Stretch" Height="24" Margin="10,0" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Column="1"/>
+
+                <Label HorizontalAlignment="Left" Margin="10,0" Content="Model" Grid.Row="1" VerticalAlignment="Center"/>
+                <TextBox x:Name="tbModel" Text="{Binding Model, FallbackValue='-'}" HorizontalAlignment="Stretch" Height="24" Margin="10,0" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Column="1" Grid.Row="1"/>
+
+                <Label HorizontalAlignment="Left" Margin="10,0" Content="Make Year" Grid.Row="2" VerticalAlignment="Center"/>
+                <TextBox x:Name="tbMakeYear" Text="{Binding MakeYear, FallbackValue='-'}" HorizontalAlignment="Stretch" Height="24" Margin="10,0" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Column="1" Grid.Row="2"/>
+
+                <Label HorizontalAlignment="Left" Margin="10,0" Content="Registration Number" Grid.Row="3" VerticalAlignment="Center"/>
+                <TextBox x:Name="tbRegistrationNumber" Text="{Binding RegistrationNumber, FallbackValue='-'}" HorizontalAlignment="Stretch" Height="24" Margin="10,0" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Column="1" Grid.Row="3"/>
+
+                <Label HorizontalAlignment="Left" Margin="10,0" Content="Tank Capacity" Grid.Row="4" VerticalAlignment="Center"/>
+                <TextBox x:Name="tbTankCapacity" Text="{Binding TankCapacity, FallbackValue='-'}" HorizontalAlignment="Stretch" Height="24" Margin="10,0" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Column="1" Grid.Row="4"/>
+
+                <Label HorizontalAlignment="Left" Margin="10,0" Content="Odometer (Saved)" Grid.Row="5" VerticalAlignment="Center"/>
+                <TextBox x:Name="tbOdometerSaved" Text="{Binding Odometer, FallbackValue='-'}" HorizontalAlignment="Stretch" Height="24" Margin="10,0" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Column="1" Grid.Row="5"/>
+
+                <Label HorizontalAlignment="Left" Margin="10,0" Content="Odometer (Current)" Grid.Row="6" VerticalAlignment="Center"/>
+                <TextBox x:Name="tbOdometerCurrent" HorizontalAlignment="Stretch" Height="24" Margin="10,0" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Column="1" Grid.Row="6"/>
+
+                <Button x:Name="btnDelete" Content="Delete" HorizontalAlignment="Left" Margin="10,0" Grid.Row="7" VerticalAlignment="Center" Width="75" Click="btnDelete_Click"/>
+
+                <Button x:Name="btnEdit" Content="Edit" HorizontalAlignment="Right" Margin="0,0,10,0" Grid.Row="7" VerticalAlignment="Center" Width="75" Grid.Column="1" Click="btnEdit_Click"/>
+                <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Right" Margin="0,0,90,0" Grid.Row="7" VerticalAlignment="Center" Width="75" Grid.Column="1" Click="btnSave_Click"/>
+            </Grid>
+        </GroupBox>
+        <Grid Grid.Column="3" Grid.Row="2" Grid.ColumnSpan="2" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+
+            <GroupBox x:Name="gbJourney" Header="Recent Journey">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="6*"/>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="6*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Start" VerticalAlignment="Top" Margin="10,10,0,0"/>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding ExternalStartDate, FallbackValue='-'}" VerticalAlignment="Center" Margin="10,0" Grid.Column="1" Grid.ColumnSpan="2"/>
+
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="End" VerticalAlignment="Top" Margin="10,10,0,0" Grid.Row="1"/>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding ExternalEndDate, FallbackValue='-'}" VerticalAlignment="Center" Margin="10,0" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"/>
+
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Distance" VerticalAlignment="Top" Margin="10,10,0,0" Grid.Row="2"/>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Distance, FallbackValue='-'}" VerticalAlignment="Center" Margin="10,0" Grid.Column="1" Grid.Row="2"/>
+
+                    <Button x:Name="btnJourneys" Content="Manage" HorizontalAlignment="Right" Width="75" Grid.Column="3" Grid.Row="2" VerticalAlignment="Center" Margin="10,0" Click="btnJourneys_Click"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox x:Name="gbFuelPurchase" Header="Recent Fuel Purchase" Grid.Row="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="6*"/>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="6*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Liters" VerticalAlignment="Top" Margin="10,10,0,0"/>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Litres, FallbackValue=-}" VerticalAlignment="Center" Margin="10,0" Grid.Column="1"/>
+
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Cost" VerticalAlignment="Top" Margin="10,9,0,0" Grid.Row="1"/>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Cost, FallbackValue=-}" VerticalAlignment="Center" Margin="10,0" Grid.Column="1" Grid.Row="1"/>
+
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Date" VerticalAlignment="Top" Margin="10,10,0,0" Grid.Row="2"/>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Date, FallbackValue=-, StringFormat=yyyy-MM-dd}" VerticalAlignment="Center" Margin="10,0" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2"/>
+
+                    <Button x:Name="btnFuelPurchases" Content="Manage" HorizontalAlignment="Right" Grid.Row="2" Width="75" Grid.Column="3" VerticalAlignment="Center" Margin="10,0" Click="btnFuelPurchases_Click" />
+                </Grid>
+            </GroupBox>
+            <GroupBox x:Name="gbRecentService" Header="Recent Service" Grid.Row="2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="6*"/>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="6*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Odometer" VerticalAlignment="Top" Margin="10,10,0,0"/>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Odometer, FallbackValue=-}" VerticalAlignment="Center" Margin="10,0" Grid.Column="1"/>
+
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Date" VerticalAlignment="Top" Margin="10,10,0,0" Grid.Row="2"/>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Date, FallbackValue=-, StringFormat=yyyy-MM-dd}" VerticalAlignment="Center" Margin="10,0" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2"/>
+
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Cost" VerticalAlignment="Top" Margin="10,10,0,0" Grid.Row="1"/>
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Cost, FallbackValue=-}" VerticalAlignment="Center" Margin="10,0" Grid.Column="1" Grid.Row="1"/>
+
+                    <Button x:Name="btnServices" Content="Manage" HorizontalAlignment="Right" Grid.Row="2" Width="75" Grid.Column="3" VerticalAlignment="Center" Margin="10,0" Click="btnServices_Click"/>
+                </Grid>
+            </GroupBox>
+        </Grid>
+        <Grid Grid.Column="1" HorizontalAlignment="Stretch" Grid.Row="3" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="10*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center" Text="Fuel Efficiency:" Margin="10,0"/>
+            <TextBlock x:Name="tbFuelEfficiency" Grid.Column="2" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10,0"/>
+            
+            <TextBlock Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Row="1" Text="Next service:" Margin="10,0"/>
+            <TextBlock x:Name="tbNextService" Grid.Column="2" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Row="1" Margin="10,0"/>
+            
+            <Button x:Name="btnBack" Content="Go Back" HorizontalAlignment="Center" VerticalAlignment="Center" Width="75" Grid.RowSpan="2" Click="btnBack_Click"/>
+        </Grid>
+    </Grid>
+</Window>
