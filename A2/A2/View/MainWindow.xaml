@@ -18,7 +18,7 @@
       <RowDefinition/>
       <RowDefinition/>
     </Grid.RowDefinitions>
-    <ListView HorizontalAlignment="Left" Height="347" Margin="10,10,0,0" VerticalAlignment="Top" Width="455" Grid.RowSpan="4" ItemsSource="{Binding Vehicles}">
+    <ListView HorizontalAlignment="Left" Height="347" Margin="10,10,0,0" VerticalAlignment="Top" Width="455" Grid.RowSpan="4" ItemsSource="{Binding Vehicles}" SelectedItem="{Binding SelectedVehicle}">
       <ListView.View>
         <GridView>
           <GridViewColumn Header="Manufacturer" DisplayMemberBinding="{Binding Manufacturer}" Width="80" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace A2
 {
   public class Vehicle
   {
+    public string Werg = "werg";
     public string Manufacturer { get; private set; }
     public string Model { get; private set; }
     public int MakeYear { get; private set; }

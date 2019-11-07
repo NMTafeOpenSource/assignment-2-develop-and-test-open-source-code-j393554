@@ -23,6 +23,7 @@ namespace A2
     public MainWindow()
     {
       InitializeComponent();
+      DataContext = new VehiclesVM();
     }
   }
 }
