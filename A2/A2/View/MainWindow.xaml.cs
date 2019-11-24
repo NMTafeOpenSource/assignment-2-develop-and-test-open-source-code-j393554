@@ -62,6 +62,8 @@ namespace A2
       if (lvVehicles.SelectedItem is Vehicle)
       {
         selectedVehicle = (Vehicle)lvVehicles.SelectedItem;
+        CollectionViewSource.GetDefaultView(lvVehicles.ItemsSource).Refresh();
+
         ObservableCollection<Journey> journeys = Journeys.ByVehicle(selectedVehicle);
         ObservableCollection<Service> services = Services.ByVehicle(selectedVehicle);
         ObservableCollection<FuelPurchase> fuelPurchases = FuelPurchases.ByVehicle(selectedVehicle);

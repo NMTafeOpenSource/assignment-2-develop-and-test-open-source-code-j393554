@@ -56,7 +56,7 @@
 
         <Button x:Name="btnAdd" Content="Add Service" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Grid.Column="1" Grid.Row="5" Click="BtnAdd_Click"/>
         <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Grid.Column="1" Grid.Row="5" Margin="80,0,0,0" Click="BtnCancel_Click"/>
-        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="76" Grid.Column="1" Grid.Row="5" Margin="0,0,80,0" Click="BtnSave_Click" IsEnabled="False"/>
-        <Button x:Name="btnDelete" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="76" Grid.Column="1" Grid.Row="5" Click="BtnDelete_Click" IsEnabled="False"/>
+        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="76" Grid.Column="1" Grid.Row="5" Margin="0,0,80,0" Click="BtnSave_Click"/>
+        <Button x:Name="btnDelete" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="76" Grid.Column="1" Grid.Row="5" Click="BtnDelete_Click"/>
     </Grid>
 </Window>

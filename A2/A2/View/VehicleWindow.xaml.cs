@@ -21,15 +21,19 @@ namespace A2
   public partial class VehicleWindow : Window
   {
     Vehicle vehicle;
+    Vehicle clonedVehicle;
 
     Vehicles vehicles;
-    Journeys journeys;
-    FuelPurchases fuelPurchases;
-    Services services;
+    
+    readonly Journeys journeys;
+    readonly FuelPurchases fuelPurchases;
+    readonly Services services;
     
     ObservableCollection<Journey> journeysList;
     ObservableCollection<FuelPurchase> fuelPurchasesList;
     ObservableCollection<Service> servicesList;
+
+    List<Control> fields;
 
     bool addMode = false, editMode = false, changes = false;
 
@@ -43,6 +47,8 @@ namespace A2
 
       tbOdometerCurrent.IsEnabled = false;
 
+      CollateFields();
+
       if ( addMode )
       {
         this.addMode = true;
@@ -51,6 +57,92 @@ namespace A2
       {
         editMode = true;
       }
+    }
+
+    /// <summary>
+    /// Collate fields for validation later
+    /// </summary>
+    private void CollateFields()
+    {
+      fields = new List<Control>( new Control[] {
+        tbManufacturer,
+        tbModel,
+        tbMakeYear,
+        tbRegistrationNumber,
+        tbTankCapacity,
+        tbOdometerSaved
+      } );
+    }
+
+    /// <summary>
+    /// Based on the collated fields and defined rules in the function, validates input
+    /// </summary>
+    /// <returns>Returns true if successful, false otherwise and shows failed validation indicators</returns>
+    private bool ValidateFields()
+    {
+      bool valid = true;
+      int anyNumberMaxValue = 500000;
+      int anyStringMaxCharacters = 200;
+
+      foreach (Control field in fields)
+      {
+        TextBox castedField = (TextBox)field;
+        castedField.ClearValue(BorderBrushProperty); // Clear visible failed validation indicator
+        bool fieldFailedValidation = false;
+
+        // Integers
+        if (castedField.Name == "tbMakeYear" || castedField.Name == "tbOdometerSaved")
+        {
+          if ( castedField.Text == "" )
+          {
+            fieldFailedValidation = true;
+          }
+          else if (!int.TryParse(castedField.Text, out int i))
+          {
+            fieldFailedValidation = true;
+          }
+          else if (int.Parse(castedField.Text) > anyNumberMaxValue)
+          {
+            fieldFailedValidation = true;
+          }
+        }
+        // Strings
+        else if (castedField.Name == "tbManufacturer" || castedField.Name == "tbModel" || castedField.Name == "tbRegistrationNumber")
+        {
+          if (castedField.Text == "")
+          {
+            fieldFailedValidation = true;
+          }
+          else if (castedField.Text.Length > anyStringMaxCharacters)
+          {
+            fieldFailedValidation = true;
+          }
+        }
+        // Decimals/doubles/floats
+        else if (castedField.Name == "tbTankCapacity")
+        {
+          if (castedField.Text == "")
+          {
+            fieldFailedValidation = true;
+          }
+          else if (!decimal.TryParse(castedField.Text, out decimal d))
+          {
+            fieldFailedValidation = true;
+          }
+          else if (decimal.Parse(castedField.Text) > anyNumberMaxValue)
+          {
+            fieldFailedValidation = true;
+          }
+        }
+
+        if ( fieldFailedValidation )
+        {
+          valid = false;
+          field.BorderBrush = Brushes.Red;
+        }
+      }
+
+      return valid;
     }
 
     /// <summary>
@@ -79,7 +171,7 @@ namespace A2
     private void UpdateOdometer()
     {
       int odometer = CalculateDistanceTraveled();
-      tbOdometer.Text = odometer.ToString() + " KM(s)";
+      tbOdometer.Text = odometer.ToString() + " km(s)";
       tbOdometerCurrent.Text = odometer.ToString();
     }
 
@@ -98,7 +190,7 @@ namespace A2
     /// Enables Add Mode, blocking out buttons, fields and blanking them. Can be toggled.
     /// </summary>
     /// <param name="enable">True to enable add mode, false otherwise</param>
-    private void ToggleAddMode( bool enable = true )
+    private void ToggleAddMode( bool enable )
     {
       addMode = enable;
 
@@ -109,6 +201,13 @@ namespace A2
       btnDelete.IsEnabled = !enable;
 
       btnSave.IsEnabled = enable;
+
+      tbManufacturer.IsEnabled = enable;
+      tbModel.IsEnabled = enable;
+      tbMakeYear.IsEnabled = enable;
+      tbRegistrationNumber.IsEnabled = enable;
+      tbTankCapacity.IsEnabled = enable;
+      tbOdometerSaved.IsEnabled = enable;
 
       if (enable)
       {
@@ -141,6 +240,8 @@ namespace A2
       tbRegistrationNumber.IsEnabled = enable;
       tbTankCapacity.IsEnabled = enable;
       tbOdometerSaved.IsEnabled = enable;
+
+      editMode = enable;
     }
 
     /// <summary>
@@ -175,18 +276,22 @@ namespace A2
     {
       int gap = vehicles.TravelServiceGap( vehicle, servicesList, journeysList );
       string nextService;
-      
+      bool warning = true;
+
+      tbNextService.ClearValue(ForegroundProperty);
 
       if ( servicesList.Count == 0 )
       {
         // A vehicle can have no service, yet.
         nextService = "No service information; New Vehicle";
+        warning = false;
         
         // But a vehicle that has no service information but its odometer is past it's service limit
         if ( vehicle.Odometer > vehicle.ServiceLimit )
         {
           // Then it's due for a service.
           nextService = "NOW";
+          warning = true;
         }
       }
       else if ( gap >= vehicle.ServiceLimit )
@@ -196,8 +301,14 @@ namespace A2
       }
       else
       {
-        // Not yet due, service in next n-KM(s)
-        nextService = "next " + (vehicle.ServiceLimit - gap).ToString() + " KM(s)";
+        // Not yet due, service in next n-km(s)
+        nextService = "Next " + (vehicle.ServiceLimit - gap).ToString() + " km(s)";
+        warning = false;
+      }
+
+      if ( warning )
+      {
+        tbNextService.Foreground = Brushes.Red;
       }
 
       tbNextService.Text = nextService;
@@ -208,7 +319,9 @@ namespace A2
     /// </summary>
     private void SetFuelEfficiency()
     {
-      string fuelEfficiencyText = "Efficiency too low (Below 1KM/L)";
+      string fuelEfficiencyText = "Efficiency too low (Below 1km/l)";
+      bool warning = true;
+      tbFuelEfficiency.ClearValue(ForegroundProperty);
 
       int totalOdometer = vehicles.TotalDistance( vehicle, journeysList );
       double totalFuelLitres = vehicles.TotalFuelLitres( fuelPurchasesList );
@@ -218,10 +331,17 @@ namespace A2
       if ( totalFuelLitres == 0 )
       {
         fuelEfficiencyText = "No fuel purchase information";
+        warning = false;
       }
       else if ( fuelEfficiency > 1 )
       {
-        fuelEfficiencyText = Math.Round( fuelEfficiency, 2 ) + " KM(s) / L";
+        fuelEfficiencyText = Math.Round( fuelEfficiency, 2 ) + " km(s) / l";
+        warning = false;
+      }
+
+      if ( warning)
+      {
+        tbFuelEfficiency.Foreground = Brushes.Red;
       }
 
       tbFuelEfficiency.Text = fuelEfficiencyText;
@@ -241,39 +361,54 @@ namespace A2
 
     private void BtnSave_Click(object sender, RoutedEventArgs e)
     {
-      if ( addMode )
+      if ( ValidateFields() )
       {
-        vehicles.Add(
-          tbManufacturer.Text,
-          tbModel.Text,
-          int.Parse(tbMakeYear.Text),
-          tbRegistrationNumber.Text,
-          double.Parse(tbTankCapacity.Text),
-          int.Parse(tbOdometerSaved.Text)
-        );
+        if ( addMode )
+        {
+          vehicles.Add(
+            tbManufacturer.Text,
+            tbModel.Text,
+            int.Parse(tbMakeYear.Text),
+            tbRegistrationNumber.Text,
+            double.Parse(tbTankCapacity.Text),
+            int.Parse(tbOdometerSaved.Text)
+          );
 
-        vehicle = vehicles.List.Last();
-        DataContext = vehicle;
+          vehicle = vehicles.List.Last();
+          DataContext = vehicle;
 
-        ToggleEditMode(false);
-        Refresh(true);
-      }
-      else
-      {
-        vehicles.Edit( (Vehicle) DataContext );
-        vehicle = (Vehicle) DataContext;
-        editMode = false;
+          ToggleEditMode(false);
+          Refresh(true);
+        }
+        else
+        {
+          vehicles.Edit( (Vehicle) DataContext );
+          vehicle = (Vehicle) DataContext;
+          editMode = false;
         
-        ToggleEditMode(false);
-        Refresh(true);
+          ToggleEditMode(false);
+          Refresh(true);
+        }
       }
     }
 
     private void BtnEdit_Click( object sender, RoutedEventArgs e )
     {
-      editMode = !editMode;
+      ToggleEditMode(true);
 
-      ToggleEditMode(editMode);
+      /**
+        * Make a copy of the vehicle in case the user decides to discard the changes. This is done because our
+        * XAML fields are two-way binded and will directly affect the list behind.
+        */
+      clonedVehicle = new Vehicle(vehicle.Id)
+      {
+        Manufacturer = vehicle.Manufacturer,
+        Model = vehicle.Model,
+        MakeYear = vehicle.MakeYear,
+        RegistrationNumber = vehicle.RegistrationNumber,
+        TankCapacity = vehicle.TankCapacity,
+        Odometer = vehicle.Odometer
+      };
     }
 
     private void BtnJourneys_Click( object sender, RoutedEventArgs e )
@@ -320,16 +455,13 @@ namespace A2
 
       if (addMode)
       {
-        ToggleAddMode();
+        ToggleEditMode(false);
+        ToggleAddMode(true);
       }
       else
       {
-        /**
-         * We already know we're viewing a vehicle when neither addMode or editMode (implied) was
-         * set to true, so we're inverting (turning off) editMode since we're not really editing.
-         */
-        editMode = ! editMode;
-        ToggleEditMode( editMode );
+        ToggleAddMode(false);
+        ToggleEditMode(false);
       }
     }
 
@@ -338,6 +470,21 @@ namespace A2
       // Refresh MainWindow if there are changes
       if ( changes )
       {
+        ( ( MainWindow ) Owner ).Refresh();
+      }
+      
+      // Watch out for closing when editMode is on. Revert changes if there are any just to be sure.
+      if ( editMode )
+      {
+        Vehicle vehicleReference = ((Vehicle)DataContext);
+        
+        vehicleReference.Manufacturer = clonedVehicle.Manufacturer;
+        vehicleReference.Model = clonedVehicle.Model;
+        vehicleReference.MakeYear = clonedVehicle.MakeYear;
+        vehicleReference.RegistrationNumber = clonedVehicle.RegistrationNumber;
+        vehicleReference.TankCapacity = clonedVehicle.TankCapacity;
+        vehicleReference.Odometer = clonedVehicle.Odometer;
+
         ( ( MainWindow ) Owner ).Refresh();
       }
     }

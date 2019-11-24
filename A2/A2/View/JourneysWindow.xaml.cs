@@ -22,22 +22,25 @@ namespace A2
   {
     Journeys journeys;
     ObservableCollection<Journey> filteredJourneys;
-    Journey selectedJourney;
+    Journey selected;
     readonly Vehicle vehicle;
     bool addMode = false, editMode = false, changes = false, isParentMain = true;
+    List<Control> fields;
 
-    public JourneysWindow( Journeys journeysVM, Vehicle vehicle, bool isParentMain = true )
+    public JourneysWindow( Journeys journeys, Vehicle vehicle, bool isParentMain = true )
     {
       InitializeComponent();
       this.vehicle = vehicle;
-      this.journeys = journeysVM;
+      this.journeys = journeys;
       this.isParentMain = isParentMain;
+
+      CollateFields();
     }
 
     /// <summary>
     /// Refreshes list by re-grouping items that belong to vehicle and refresh list view.
     /// </summary>
-    private void RefreshList()
+    private void Refresh()
     {
       filteredJourneys = journeys.ByVehicle(vehicle);
       lvJourneys.ItemsSource = filteredJourneys;
@@ -48,12 +51,17 @@ namespace A2
     /// Enables Edit mode, blocking out buttons, fields and blanking them. Can be toggled.
     /// </summary>
     /// <param name="enable"></param>
-    private void ToggleEditFields( bool enable )
+    private void ToggleEditMode( bool enable )
     {
       dtpStartDate.IsEnabled = enable;
       dtpEndDate.IsEnabled = enable;
       tbStartOdometer.IsEnabled = enable;
       tbEndOdometer.IsEnabled = enable;
+
+      btnSave.IsEnabled = enable;
+      btnDelete.IsEnabled = enable;
+
+      editMode = enable;
     }
 
     /// <summary>
@@ -84,7 +92,14 @@ namespace A2
         SetSelectedToFields( true );
       }
 
-      ToggleEditFields( enable );
+      tbStartOdometer.IsEnabled = enable;
+      tbEndOdometer.IsEnabled = enable;
+      
+      dtpStartDate.IsEnabled = enable;
+      dtpEndDate.IsEnabled = enable;
+
+      btnSave.IsEnabled = false;
+      btnDelete.IsEnabled = false;
     }
 
     /// <summary>
@@ -102,10 +117,10 @@ namespace A2
       }
       else
       {
-        dtpStartDate.Value = selectedJourney.StartDate;
-        dtpEndDate.Value = selectedJourney.EndDate;
-        tbStartOdometer.Text = selectedJourney.StartOdometer.ToString();
-        tbEndOdometer.Text = selectedJourney.EndOdometer.ToString();
+        dtpStartDate.Value = selected.StartDate;
+        dtpEndDate.Value = selected.EndDate;
+        tbStartOdometer.Text = selected.StartOdometer.ToString();
+        tbEndOdometer.Text = selected.EndOdometer.ToString();
       }
     }
 
@@ -127,69 +142,166 @@ namespace A2
       tbEndOdometer.Text = Odometer;
     }
 
+    /// <summary>
+    /// Collate fields for validation later
+    /// </summary>
+    private void CollateFields()
+    {
+      fields = new List<Control>(new Control[] {
+        tbStartOdometer,
+        tbEndOdometer,
+        dtpStartDate,
+        dtpEndDate
+      });
+    }
+
+    /// <summary>
+    /// Based on the collated fields and defined rules in the function, validates input
+    /// </summary>
+    /// <returns>Returns true if successful, false otherwise and shows failed validation indicators</returns>
+    private bool ValidateFields()
+    {
+      bool valid = true;
+      int anyNumberMaxValue = 500000;
+
+      foreach (Control field in fields)
+      {
+        field.ClearValue(BorderBrushProperty); // Clear visible failed validation indicator
+        bool fieldFailedValidation = false;
+
+        // Integers
+        if (field.Name == "tbStartOdometer" || field.Name == "tbEndOdometer")
+        {
+          TextBox castedField = (TextBox)field;
+
+          if (castedField.Text == "")
+          {
+            fieldFailedValidation = true;
+          }
+          else if (!int.TryParse(castedField.Text, out int i))
+          {
+            fieldFailedValidation = true;
+          }
+          else if (int.Parse(castedField.Text) > anyNumberMaxValue)
+          {
+            fieldFailedValidation = true;
+          }
+        }
+        else if ( field is Xceed.Wpf.Toolkit.DateTimePicker castedField )
+        {
+          // Check for null values
+          if (castedField.Value == null)
+          {
+            fieldFailedValidation = true;
+          }
+        }
+
+        if ( fieldFailedValidation )
+        {
+          valid = false;
+          field.BorderBrush = Brushes.Red;
+        }
+      }
+
+      // Additional checks that cannot be sanely validated by checking every field but seemingly all valid
+      if ( valid )
+      {
+        int.TryParse(tbStartOdometer.Text, out int start);
+        int.TryParse(tbEndOdometer.Text, out int end);
+
+        // Start odometer can't be greater than end odometer.
+        if ( start > end )
+        {
+          tbStartOdometer.BorderBrush = Brushes.Red;
+          tbEndOdometer.BorderBrush = Brushes.Red;
+          valid = false;
+        }
+
+        // Start date can't be greater than end date
+        if ( dtpStartDate.Value > dtpEndDate.Value )
+        {
+          dtpStartDate.BorderBrush = Brushes.Red;
+          dtpEndDate.BorderBrush = Brushes.Red;
+          valid = false;
+        }
+      }
+
+      return valid;
+    }
+
     private void LvJourneys_SelectionChanged( object sender, SelectionChangedEventArgs e )
     {
       if ( lvJourneys.SelectedItem is Journey )
       {
         if ( ! editMode )
         {
-          editMode = true;
-
-          btnSave.IsEnabled = true;
-          btnDelete.IsEnabled = true;
-          ToggleEditFields( true );
+          ToggleEditMode( true );
         }
 
-        selectedJourney = ( Journey ) lvJourneys.SelectedItem;
+        selected = ( Journey ) lvJourneys.SelectedItem;
         SetSelectedToFields();
-
       }
     }
 
     private void BtnAdd_Click( object sender, RoutedEventArgs e )
     {
-      if (editMode)
+      if ( editMode )
       {
-        editMode = false;
+        ToggleEditMode( false );
       }
 
-      if (addMode)
+      if ( addMode )
       {
-        // TODO: Validate
-        journeys.Add(
-          vehicle,
-          (DateTime)dtpStartDate.Value,
-          (DateTime)dtpEndDate.Value,
-          int.Parse(tbStartOdometer.Text),
-          int.Parse(tbEndOdometer.Text)
-        );
+        if ( ValidateFields() )
+        {
+          journeys.Add(
+            vehicle,
+            (DateTime)dtpStartDate.Value,
+            (DateTime)dtpEndDate.Value,
+            int.Parse(tbStartOdometer.Text),
+            int.Parse(tbEndOdometer.Text)
+          );
 
-        changes = true;
-
-        // Refresh list
-        RefreshList();
+          changes = true;
+          ToggleAddMode( false );
+          Refresh();
+        }
       }
-
-      ToggleAddMode(addMode ? false : true);
+      else
+      {
+        ToggleAddMode( true );
+      }
     }
     
     private void BtnSave_Click( object sender, RoutedEventArgs e )
     {
-      journeys.EditJourney( selectedJourney, (DateTime) dtpStartDate.Value, (DateTime) dtpEndDate.Value, int.Parse( tbStartOdometer.Text ), int.Parse( tbEndOdometer.Text ) );
-      RefreshList();
-      changes = true;
+      if (ValidateFields())
+      {
+        journeys.EditJourney( selected, (DateTime) dtpStartDate.Value, (DateTime) dtpEndDate.Value, int.Parse( tbStartOdometer.Text ), int.Parse( tbEndOdometer.Text ) );
+        Refresh();
+        changes = true;
+
+        lvJourneys.UnselectAll();
+        SetSelectedToFields( true );
+
+        if (addMode)
+        {
+          ToggleAddMode(false);
+
+        }
+        else
+        {
+          ToggleEditMode(false);
+        }
+      }
     }
 
     private void BtnDelete_Click( object sender, RoutedEventArgs e )
     {
-      journeys.DeleteJourney( selectedJourney );
+      journeys.Delete( selected );
       SetSelectedToFields( true );
-      ToggleEditFields( false );
-      RefreshList();
-      editMode = false;
-      btnSave.IsEnabled = false;
-      btnDelete.IsEnabled = false;
-
+      ToggleEditMode( false );
+      Refresh();
       changes = true;
     }
     
@@ -200,8 +312,9 @@ namespace A2
     
     private void Window_Loaded( object sender, RoutedEventArgs e )
     {
-      RefreshList();
+      Refresh();
       ToggleAddMode(false);
+      ToggleEditMode(false);
     }
 
     private void Window_Closing( object sender, System.ComponentModel.CancelEventArgs e )

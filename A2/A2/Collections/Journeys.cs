@@ -75,7 +75,7 @@ namespace A2
     /// Deletes a Journey
     /// </summary>
     /// <param name="journey">Journey to be deleted</param>
-    public void DeleteJourney( Journey journey )
+    public void Delete( Journey journey )
     {
       List.Remove( journey );
     }

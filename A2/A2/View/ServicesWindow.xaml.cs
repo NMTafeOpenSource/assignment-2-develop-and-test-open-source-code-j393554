@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace A2
 {
@@ -18,6 +20,7 @@ namespace A2
     Service selected;
     readonly Vehicle vehicle;
     bool addMode = false, editMode = false, changes = false, isParentMain = true;
+    List<Control> fields;
 
     public ServicesWindow( Services services, Vehicle vehicle, Journeys journeys, bool isParentMain = true )
     {
@@ -27,6 +30,8 @@ namespace A2
       this.services = services;
       this.journeys = journeys;
       this.isParentMain = isParentMain;
+
+      CollateFields();
     }
 
     /// <summary>
@@ -67,7 +72,28 @@ namespace A2
         SetSelectedToFields( true );
       }
 
-      ToggleEditFields(enable);
+      tbCost.IsEnabled = enable;
+      tbOdometer.IsEnabled = enable;
+      dpDate.IsEnabled = enable;
+
+      btnSave.IsEnabled = false;
+      btnDelete.IsEnabled = false;
+    }
+
+    /// <summary>
+    /// Enables Edit mode, blocking out buttons, fields and blanking them. Can be toggled.
+    /// </summary>
+    /// <param name="enable"></param>
+    private void ToggleEditMode( bool enable )
+    {
+      tbOdometer.IsEnabled = enable;
+      tbCost.IsEnabled = enable;
+      dpDate.IsEnabled = enable;
+
+      btnSave.IsEnabled = enable;
+      btnDelete.IsEnabled = enable;
+
+      editMode = enable;
     }
 
     /// <summary>
@@ -91,17 +117,6 @@ namespace A2
     }
 
     /// <summary>
-    /// Enables Edit mode, blocking out buttons, fields and blanking them. Can be toggled.
-    /// </summary>
-    /// <param name="enable"></param>
-    private void ToggleEditFields( bool enable )
-    {
-      tbOdometer.IsEnabled = enable;
-      tbCost.IsEnabled = enable;
-      dpDate.IsEnabled = enable;
-    }
-
-    /// <summary>
     /// On change of selection in list view, update information shown in grouped fields.
     /// </summary>
     /// <param name="empty">True to empty fields, otherwise false to leave alone.</param>
@@ -121,49 +136,146 @@ namespace A2
       }
     }
 
+    /// <summary>
+    /// Collate fields for validation later
+    /// </summary>
+    private void CollateFields()
+    {
+      fields = new List<Control>(new Control[] {
+        tbOdometer,
+        tbCost,
+        dpDate
+      });
+    }
+
+    /// <summary>
+    /// Based on the collated fields and defined rules in the function, validates input
+    /// </summary>
+    /// <returns>Returns true if successful, false otherwise and shows failed validation indicators</returns>
+    private bool ValidateFields()
+    {
+      bool valid = true;
+      int anyNumberMaxValue = 500000;
+
+      foreach (Control field in fields)
+      {
+        field.ClearValue(BorderBrushProperty); // Clear visible failed validation indicator
+        bool fieldFailedValidation = false;
+
+        if ( field is DatePicker castedDatePickerField )
+        {
+          // Check for null values
+          if ( castedDatePickerField.SelectedDate == null )
+          {
+            fieldFailedValidation = true;
+          }
+        }
+        else
+        {
+          TextBox castedField = (TextBox)field;
+
+          // Decimals/doubles/floats
+          if ( castedField.Name == "tbCost" )
+          {
+            if ( castedField.Text == "" )
+            {
+              fieldFailedValidation = true;
+            }
+            else if (!decimal.TryParse(castedField.Text, out decimal d))
+            {
+              fieldFailedValidation = true;
+            }
+            else if (decimal.Parse(castedField.Text) > anyNumberMaxValue)
+            {
+              fieldFailedValidation = true;
+            }
+          }
+          // Integers
+          else if ( castedField.Name == "tbOdometer" )
+          {
+            if ( castedField.Text == "" )
+            {
+              fieldFailedValidation = true;
+            }
+            else if (!int.TryParse(castedField.Text, out int i))
+            {
+              fieldFailedValidation = true;
+            }
+            else if (int.Parse(castedField.Text) > anyNumberMaxValue)
+            {
+              fieldFailedValidation = true;
+            }
+          }
+        }
+
+        if ( fieldFailedValidation )
+        {
+          valid = false;
+          field.BorderBrush = Brushes.Red;
+        }
+      }
+
+      return valid;
+    }
+
     private void BtnAdd_Click( object sender, RoutedEventArgs e )
     {
       if (editMode)
       {
-        editMode = false;
+        ToggleEditMode(false);
       }
 
       if (addMode)
       {
-        // TODO: Validate
-        services.Add(
-          vehicle,
-          int.Parse(tbOdometer.Text),
-          decimal.Parse(tbCost.Text),
-          (DateTime)dpDate.SelectedDate
-        );
+        if (ValidateFields())
+        {
+          services.Add(
+            vehicle,
+            int.Parse(tbOdometer.Text),
+            decimal.Parse(tbCost.Text),
+            (DateTime)dpDate.SelectedDate
+          );
 
-        changes = true;
-
-        // Refresh list
-        Refresh();
+          changes = true;
+          ToggleAddMode(false);
+          Refresh();
+        }
       }
-
-      ToggleAddMode(addMode ? false : true);
+      else
+      {
+        ToggleAddMode(true);
+      }
     }
 
     private void BtnSave_Click( object sender, RoutedEventArgs e )
     {
-      services.Edit( selected, int.Parse( tbOdometer.Text ), decimal.Parse( tbCost.Text ), ( DateTime ) dpDate.SelectedDate );
-      Refresh();
-      changes = true;
+      if (ValidateFields())
+      {
+        services.Edit(selected, int.Parse(tbOdometer.Text), decimal.Parse(tbCost.Text), (DateTime)dpDate.SelectedDate);
+        Refresh();
+        changes = true;
+
+        lvItems.UnselectAll();
+        SetSelectedToFields(true);
+
+        if (addMode)
+        {
+          ToggleAddMode(false);
+
+        }
+        else
+        {
+          ToggleEditMode(false);
+        }
+      }
     }
 
     private void BtnDelete_Click( object sender, RoutedEventArgs e )
     {
       services.Delete( selected );
       SetSelectedToFields(true);
-      ToggleEditFields( false );
+      ToggleEditMode( false );
       Refresh();
-      editMode = false;
-      btnSave.IsEnabled = false;
-      btnDelete.IsEnabled = false;
-
       changes = true;
     }
 
@@ -176,13 +288,9 @@ namespace A2
     {
       if (lvItems.SelectedItem is Service)
       {
-        if (!editMode)
+        if ( ! editMode)
         {
-          editMode = true;
-
-          btnSave.IsEnabled = true;
-          btnDelete.IsEnabled = true;
-          ToggleEditFields(true);
+          ToggleEditMode(true);
         }
 
         selected = ( Service ) lvItems.SelectedItem;
@@ -194,6 +302,7 @@ namespace A2
     {
       Refresh();
       ToggleAddMode( false );
+      ToggleEditMode( false );
     }
 
     private void Window_Closing( object sender, CancelEventArgs e )

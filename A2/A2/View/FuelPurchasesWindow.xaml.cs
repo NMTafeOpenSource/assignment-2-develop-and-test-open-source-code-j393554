@@ -26,6 +26,7 @@ namespace A2
     FuelPurchase selected;
     readonly Vehicle vehicle;
     bool addMode = false, editMode = false, changes = false, isParentMain = true;
+    List<Control> fields;
 
     public FuelPurchasesWindow( FuelPurchases fuelPurchases, Vehicle vehicle, bool isParentMain = true )
     {
@@ -34,6 +35,8 @@ namespace A2
       this.vehicle = vehicle;
       this.fuelPurchases = fuelPurchases;
       this.isParentMain = isParentMain;
+
+      CollateFields();
     }
 
     /// <summary>
@@ -73,18 +76,28 @@ namespace A2
         SetSelectedToFields(true);
       }
 
-      ToggleEditFields(enable);
+      tbLitres.IsEnabled = enable;
+      tbCost.IsEnabled = enable;
+      dpDate.IsEnabled = enable;
+
+      btnSave.IsEnabled = false;
+      btnDelete.IsEnabled = false;
     }
 
     /// <summary>
     /// Enables Edit mode, blocking out buttons, fields and blanking them. Can be toggled.
     /// </summary>
     /// <param name="enable"></param>
-    private void ToggleEditFields( bool enable )
+    private void ToggleEditMode( bool enable )
     {
       tbLitres.IsEnabled = enable;
       tbCost.IsEnabled = enable;
       dpDate.IsEnabled = enable;
+
+      btnSave.IsEnabled = enable;
+      btnDelete.IsEnabled = enable;
+
+      editMode = enable;
     }
 
     /// <summary>
@@ -107,17 +120,77 @@ namespace A2
       }
     }
 
+    /// <summary>
+    /// Collate fields for validation later
+    /// </summary>
+    private void CollateFields()
+    {
+      fields = new List<Control>( new Control[] {
+        tbLitres,
+        tbCost,
+        dpDate
+      } );
+    }
+
+    /// <summary>
+    /// Based on the collated fields and defined rules in the function, validates input
+    /// </summary>
+    /// <returns>Returns true if successful, false otherwise and shows failed validation indicators</returns>
+    private bool ValidateFields()
+    {
+      bool valid = true;
+      int anyNumberMaxValue = 100000;
+
+      foreach (Control field in fields)
+      {
+        field.ClearValue(BorderBrushProperty); // Clear visible failed validation indicator
+        bool fieldFailedValidation = false;
+
+        if ( field is DatePicker castedDatePicker )
+        {
+          if ( castedDatePicker.SelectedDate == null )
+          {
+            fieldFailedValidation = true;
+          }
+        }
+        else
+        {
+          TextBox castedField = (TextBox)field;
+
+          if (castedField.Name == "tbLitres" || castedField.Name == "tbCost")
+          {
+            if ( castedField.Text == "" )
+            {
+              fieldFailedValidation = true;
+            }
+            else if ( ! decimal.TryParse(castedField.Text, out decimal d))
+            {
+              fieldFailedValidation = true;
+            }
+            else if ( decimal.Parse( castedField.Text ) > anyNumberMaxValue)
+            {
+              fieldFailedValidation = true;
+            }
+          }
+        }
+
+        if ( fieldFailedValidation )
+        {
+          valid = false;
+          field.BorderBrush = Brushes.Red;
+        }
+      }
+
+      return valid;
+    }
+
     private void LvItems_SelectionChanged( object sender, SelectionChangedEventArgs e )
     {
       if (lvItems.SelectedItem is FuelPurchase)
       {
-        if (!editMode)
+        if ( ! editMode)
         {
-          editMode = true;
-
-          btnSave.IsEnabled = true;
-          btnDelete.IsEnabled = true;
-          ToggleEditFields(true);
+          ToggleEditMode(true);
         }
 
         selected = (FuelPurchase)lvItems.SelectedItem;
@@ -127,28 +200,31 @@ namespace A2
 
     private void BtnAdd_Click( object sender, RoutedEventArgs e )
     {
-      if (editMode)
+      if ( editMode )
       {
-        editMode = false;
+        ToggleEditMode( false );
       }
 
       if (addMode)
       {
-        // TODO: Validate
-        fuelPurchases.Add(
-          vehicle,
-          decimal.Parse(tbCost.Text),
-          double.Parse(tbLitres.Text),
-          (DateTime)dpDate.SelectedDate
-        );
+        if ( ValidateFields() )
+        {
+          fuelPurchases.Add(
+            vehicle,
+            decimal.Parse(tbCost.Text),
+            double.Parse(tbLitres.Text),
+            (DateTime)dpDate.SelectedDate
+          );
 
-        changes = true;
-
-        // Refresh list
-        Refresh();
+          changes = true;
+          ToggleAddMode( false );
+          Refresh();
+        }
       }
-
-      ToggleAddMode(addMode ? false : true);
+      else
+      {
+        ToggleAddMode( true );
+      }
     }
 
     private void BtnCancel_Click( object sender, RoutedEventArgs e )
@@ -158,21 +234,34 @@ namespace A2
 
     private void BtnSave_Click( object sender, RoutedEventArgs e )
     {
-      fuelPurchases.Edit(selected, decimal.Parse(tbCost.Text), double.Parse(tbLitres.Text), (DateTime)dpDate.SelectedDate);
-      Refresh();
-      changes = true;
+      if ( ValidateFields() )
+      {
+        fuelPurchases.Edit(selected, decimal.Parse(tbCost.Text), double.Parse(tbLitres.Text), (DateTime)dpDate.SelectedDate);
+        Refresh();
+
+        changes = true;
+        
+        lvItems.UnselectAll();
+        SetSelectedToFields( true );
+
+        if ( addMode )
+        {
+          ToggleAddMode(false);
+
+        }
+        else
+        {
+          ToggleEditMode(false);
+        }
+      }
     }
 
     private void BtnDelete_Click( object sender, RoutedEventArgs e )
     {
       fuelPurchases.Delete(selected);
       SetSelectedToFields(true);
-      ToggleEditFields(false);
+      ToggleEditMode(false);
       Refresh();
-      editMode = false;
-      btnSave.IsEnabled = false;
-      btnDelete.IsEnabled = false;
-
       changes = true;
     }
 
@@ -191,11 +280,12 @@ namespace A2
         }
       }
     }
-
+    
     private void Window_Loaded( object sender, RoutedEventArgs e )
     {
       Refresh();
       ToggleAddMode( false );
+      ToggleEditMode( false );
     }
   }
 }
