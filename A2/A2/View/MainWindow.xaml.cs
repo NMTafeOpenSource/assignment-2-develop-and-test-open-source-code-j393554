@@ -46,7 +46,8 @@ namespace A2
       Journeys.Add( Vehicles.List[0], new DateTime(2019, 3, 16, 21, 10, 00), 20 );
       Journeys.Add( Vehicles.List[2], new DateTime(2019, 11, 19, 18, 10, 00), 30 );
 
-      FuelPurchases.Add( Vehicles.List[0], 357.11m, 999337.327, new DateTime(2019, 11, 18, 22, 15, 00));
+      FuelPurchases.Add( Vehicles.List[0], 357.11m, 39.23, new DateTime(2019, 11, 18, 22, 15, 00));
+      FuelPurchases.Add( Vehicles.List[0], 161.80m, 49.57, new DateTime(2019, 11, 21, 12, 15, 00));
 
       Services.Add( Vehicles.List[0], 10, 473.02m, new DateTime(2018, 12, 20) );
       Services.Add( Vehicles.List[0], 15, 537.20m, new DateTime(2019, 3, 16) );
@@ -57,7 +58,7 @@ namespace A2
     /// </summary>
     public void Refresh()
     {
-      string selectedVehicleOdometer;
+      string selectedVehicleOdometer = "-";
 
       if (lvVehicles.SelectedItem is Vehicle)
       {
@@ -80,7 +81,6 @@ namespace A2
       else
       {
         gbJourney.DataContext = null;
-        selectedVehicleOdometer = "-";
         SetVehiclePropertyButtons(false);
       }
 

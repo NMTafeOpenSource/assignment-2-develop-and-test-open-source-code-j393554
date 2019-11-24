@@ -222,7 +222,7 @@ namespace A2
     {
       if (ValidateFields())
       {
-        journeys.EditJourney( selected, (DateTime) dtpDate.Value, int.Parse( tbDistance.Text ) );
+        journeys.Edit( selected, (DateTime) dtpDate.Value, int.Parse( tbDistance.Text ) );
         Refresh();
         changes = true;
 

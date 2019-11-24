@@ -42,17 +42,5 @@ namespace A2
     {
       Id = id;
     }
-
-    public int TotalDistanceTraveled( ObservableCollection<Journey> journeys )
-    {
-      int distanceTravelledByJourneys = 0;
-
-      foreach ( Journey journey in journeys )
-      {
-        distanceTravelledByJourneys += journey.Distance;
-      }
-
-      return distanceTravelledByJourneys;
-    }
   }
 }

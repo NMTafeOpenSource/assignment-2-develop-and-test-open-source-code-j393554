@@ -52,7 +52,7 @@ namespace A2
     /// <param name="journey">Journey to be referenced and to be modified</param>
     /// <param name="date">Date/time of journey</param>
     /// <param name="distance">Distance of the journey</param>
-    public void EditJourney( Journey journey, DateTime date, int distance )
+    public void Edit( Journey journey, DateTime date, int distance )
     {
       var FindJourney = List.FirstOrDefault( j => j.Id == journey.Id );
 

@@ -179,7 +179,7 @@ namespace A2
     private int CalculateDistanceTraveled()
     {
       int odometer;
-      odometer = vehicle.TotalDistanceTraveled(journeysList);
+      odometer = vehicles.TotalDistance(journeysList);
       return odometer;
     }
 
@@ -213,7 +213,7 @@ namespace A2
         tbMakeYear.Text = null;
         tbRegistrationNumber.Text = null;
         tbTankCapacity.Text = null;
-        tbServiceLimit.Text = null;
+        tbServiceLimit.Text = vehicles.DefaultVehicleServiceLimit.ToString();
       }
     }
 

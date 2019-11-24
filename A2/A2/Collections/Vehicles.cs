@@ -11,7 +11,7 @@ namespace A2
   public class Vehicles
   {
     public ObservableCollection<Vehicle> List { get; private set; }
-    public int defaultVehicleServiceLimit = 10000;
+    public int DefaultVehicleServiceLimit = 10000;
 
     public Vehicles()
     {
@@ -46,7 +46,7 @@ namespace A2
 
       if ( serviceLimit == 0 )
       {
-        serviceLimit = defaultVehicleServiceLimit;
+        serviceLimit = DefaultVehicleServiceLimit;
       }
       
       List.Add(
@@ -68,6 +68,11 @@ namespace A2
     /// <param name="vehicle">The vehicle object to add into the list.</param>
     public void Add( Vehicle vehicle )
     {
+      if ( vehicle.ServiceLimit == 0 )
+      {
+        vehicle.ServiceLimit = DefaultVehicleServiceLimit;
+      }
+
       List.Add( vehicle );
     }
 
@@ -120,7 +125,6 @@ namespace A2
     /// <summary>
     /// Retrieves the total distance of a vehicle. Requires a list of journeys.
     /// </summary>
-    /// <param name="vehicle">Vehicle to retrieve total distance</param>
     /// <param name="journeys">List of journeys to search.</param>
     /// <returns>The total distance travelled by the vehicle</returns>
     public int TotalDistance( ObservableCollection<Journey> journeys )
@@ -131,7 +135,6 @@ namespace A2
       {
         distanceTravelledByJourneys += journey.Distance;
       }
-
 
       return distanceTravelledByJourneys;
     }
@@ -170,7 +173,7 @@ namespace A2
       if ( services.Count > 0 )
       {
         recentService = services[0];
-        gap = totalDistanceTravelled - recentService.Odometer;
+        gap = ( recentService.Odometer + DefaultVehicleServiceLimit ) - totalDistanceTravelled;
       }
       else
       {

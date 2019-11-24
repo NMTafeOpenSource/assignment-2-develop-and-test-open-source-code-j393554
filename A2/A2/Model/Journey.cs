@@ -23,7 +23,7 @@ namespace A2
     public string ExternalDate {
       get
       {
-        return Date.ToString("yyyy-MM-dd HH:mm tt");
+        return Date.ToString("yyyy-MM-dd hh:mm tt");
       }
     }
 
