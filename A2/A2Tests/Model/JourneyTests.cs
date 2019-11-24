@@ -9,27 +9,18 @@ using System.Threading.Tasks;
 namespace A2.Tests
 {
   [TestClass()]
-  public class JourneyTests : JourneyMock
+  public class JourneyTests : MockObjects
   {
     [TestMethod()]
-    public void JourneyTest()
+    public void VehicleIdTest()
     {
-      Assert.AreEqual(0, JourneyMock1.GetKilometers());
-      Assert.AreEqual(78517, JourneyMock2.GetKilometers());
+      Assert.AreEqual(1, Journeys1.List[0].VehicleId);
     }
 
     [TestMethod()]
-    public void AddKilometersTest()
+    public void JourneyExternalDateTest()
     {
-      JourneyMock1.AddKilometers(12739);
-      Assert.AreEqual(12739, JourneyMock1.GetKilometers());
-    }
-
-    [TestMethod()]
-    public void GetKilometersTest()
-    {
-      JourneyMock2.AddKilometers(39901);
-      Assert.AreEqual(118418, JourneyMock2.GetKilometers());
+      Assert.AreEqual("2019-01-15 03:45 PM", Journeys1.List[0].ExternalDate);
     }
   }
 }
