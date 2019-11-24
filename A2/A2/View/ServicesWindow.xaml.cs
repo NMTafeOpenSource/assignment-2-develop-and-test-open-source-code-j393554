@@ -15,20 +15,18 @@ namespace A2
   public partial class ServicesWindow : Window
   {
     Services services;
-    Journeys journeys;
     ObservableCollection<Service> filtered;
     Service selected;
     readonly Vehicle vehicle;
     bool addMode = false, editMode = false, changes = false, isParentMain = true;
     List<Control> fields;
 
-    public ServicesWindow( Services services, Vehicle vehicle, Journeys journeys, bool isParentMain = true )
+    public ServicesWindow( Services services, Vehicle vehicle, bool isParentMain = true )
     {
       InitializeComponent();
 
       this.vehicle = vehicle;
       this.services = services;
-      this.journeys = journeys;
       this.isParentMain = isParentMain;
 
       CollateFields();
@@ -61,7 +59,6 @@ namespace A2
         btnCancel.Visibility = Visibility.Visible;
 
         SetSelectedToFields( true );
-        PrefillNewItemFields();
       }
       else
       {
@@ -94,26 +91,6 @@ namespace A2
       btnDelete.IsEnabled = enable;
 
       editMode = enable;
-    }
-
-    /// <summary>
-    /// Prefill's fields based on information of a vehicle or its journeys
-    /// </summary>
-    private void PrefillNewItemFields()
-    {
-      Journey recentJourney = journeys.recentJourney( vehicle );
-      string Odometer;
-
-      if (recentJourney != null)
-      {
-        Odometer = recentJourney.EndOdometer.ToString();
-      }
-      else
-      {
-        Odometer = vehicle.Odometer.ToString();
-      }
-
-      tbOdometer.Text = Odometer;
     }
 
     /// <summary>

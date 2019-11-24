@@ -11,6 +11,7 @@ namespace A2
   public class Vehicles
   {
     public ObservableCollection<Vehicle> List { get; private set; }
+    public int defaultVehicleServiceLimit = 10000;
 
     public Vehicles()
     {
@@ -34,13 +35,18 @@ namespace A2
     /// <param name="makeYear">Make Year</param>
     /// <param name="registrationNumber">Registration Number</param>
     /// <param name="tankCapacity">Tank Capacity. Up to 2 decimal points.</param>
-    /// <param name="odometer">Odometer</param>
+    /// <param name="serviceLimit">Service Limit</param>
     /// <param name="id">(Optional) ID of the vehicle</param>
-    public void Add(string manufacturer, string model, int makeYear, string registrationNumber, double tankCapacity, int odometer, int id = 0)
+    public void Add(string manufacturer, string model, int makeYear, string registrationNumber, double tankCapacity, int serviceLimit = 0, int id = 0)
     {
       if ( id == 0 )
       {
         id = FindId();
+      }
+
+      if ( serviceLimit == 0 )
+      {
+        serviceLimit = defaultVehicleServiceLimit;
       }
       
       List.Add(
@@ -51,7 +57,7 @@ namespace A2
           MakeYear = makeYear,
           RegistrationNumber = registrationNumber,
           TankCapacity = tankCapacity,
-          Odometer = odometer
+          ServiceLimit = serviceLimit
         }
       );
     }
@@ -74,8 +80,8 @@ namespace A2
     /// <param name="makeYear">Make Year</param>
     /// <param name="registrationNumber">Registration Number</param>
     /// <param name="tankCapacity">Tank Capacity. Up to 2 decimal points.</param>
-    /// <param name="odometer">Odometer</param>
-    public void Edit( Vehicle vehicle, string manufacturer, string model, int makeYear, string registrationNumber, double tankCapacity, int odometer )
+    /// <param name="serviceLimit">Service Limit</param>
+    public void Edit( Vehicle vehicle, string manufacturer, string model, int makeYear, string registrationNumber, double tankCapacity, int serviceLimit)
     {
       var Found = List.FirstOrDefault(i => i.Id == vehicle.Id);
 
@@ -86,7 +92,7 @@ namespace A2
         vehicle.MakeYear = makeYear;
         vehicle.RegistrationNumber = registrationNumber;
         vehicle.TankCapacity = tankCapacity;
-        vehicle.Odometer = odometer;
+        vehicle.ServiceLimit = serviceLimit;
       }
     }
 
@@ -117,22 +123,15 @@ namespace A2
     /// <param name="vehicle">Vehicle to retrieve total distance</param>
     /// <param name="journeys">List of journeys to search.</param>
     /// <returns>The total distance travelled by the vehicle</returns>
-    public int TotalDistance( Vehicle vehicle, ObservableCollection<Journey> journeys )
+    public int TotalDistance( ObservableCollection<Journey> journeys )
     {
-      int distanceTravelledByJourneys = vehicle.Odometer;
+      int distanceTravelledByJourneys = 0;
 
-      if ( journeys.Count > 0 )
+      foreach (Journey journey in journeys)
       {
-        distanceTravelledByJourneys = journeys[0].EndOdometer;
+        distanceTravelledByJourneys += journey.Distance;
       }
 
-      // TODO: Commented until journeys are simplified to use distance travelled than start/end odometer
-      //foreach ( Journey journey in journeys )
-      //{
-      //  distanceTravelledByJourneys += journey.Distance;
-      //}
-
-      //return vehicleOdometer + distanceTravelledByJourneys;
 
       return distanceTravelledByJourneys;
     }
@@ -158,14 +157,13 @@ namespace A2
     /// <summary>
     /// Determine gap between recent service and total travelled distance. Will require a list of journeys and services
     /// </summary>
-    /// <param name="vehicle">Vehicle to be inspected</param>
     /// <param name="services">List of services to be checked for recent service. List must be sorted already by descending date</param>
     /// <param name="journeys">List of journeys where distance travelled to be tallied.</param>
     /// <returns></returns>
-    public int TravelServiceGap( Vehicle vehicle, ObservableCollection<Service> services, ObservableCollection<Journey> journeys )
+    public int TravelServiceGap( ObservableCollection<Service> services, ObservableCollection<Journey> journeys )
     {
       int gap;
-      int totalDistanceTravelled = TotalDistance( vehicle, journeys ); // Retrieve total distance travelled by vehicle.
+      int totalDistanceTravelled = TotalDistance( journeys ); // Retrieve total distance travelled by vehicle.
       Service recentService;
 
       // If vehicle has a service, get the most recent service and match against odometer and total distance.

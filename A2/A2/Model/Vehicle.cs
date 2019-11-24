@@ -16,8 +16,7 @@ namespace A2
     public int MakeYear { get; set; }
     public string RegistrationNumber { get; set; }
     public double TankCapacity { get; set; }
-    public int Odometer { get; set; }
-    public int ServiceLimit = 10000;
+    public int ServiceLimit { get; set; }
     public string Name
     {
       get
@@ -47,14 +46,13 @@ namespace A2
     public int TotalDistanceTraveled( ObservableCollection<Journey> journeys )
     {
       int distanceTravelledByJourneys = 0;
-      int vehicleOdometer = Odometer;
 
       foreach ( Journey journey in journeys )
       {
         distanceTravelledByJourneys += journey.Distance;
       }
 
-      return vehicleOdometer + distanceTravelledByJourneys;
+      return distanceTravelledByJourneys;
     }
   }
 }

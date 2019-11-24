@@ -31,21 +31,17 @@ namespace A2
     /// Add new journey into the collection
     /// </summary>
     /// <param name="vehicle">Vehicle to be referenced on this Journey</param>
-    /// <param name="startDate">Start date/time of journey</param>
-    /// <param name="endDate">End date/time of journey</param>
-    /// <param name="startOdometer">Start odometer of the journey</param>
-    /// <param name="endOdometer">End odometer of the journey</param>
-    public void Add( Vehicle vehicle, DateTime startDate, DateTime endDate, int startOdometer, int endOdometer )
+    /// <param name="date">Date/time of journey</param>
+    /// <param name="distance">Distance of the journey</param>
+    public void Add( Vehicle vehicle, DateTime date, int distance )
     {
       int id = FindId();
 
       List.Add(
         new Journey( id, vehicle )
         {
-          StartDate = startDate,
-          EndDate = endDate,
-          StartOdometer = startOdometer,
-          EndOdometer = endOdometer,
+          Date = date,
+          Distance = distance,
         }
       );
     }
@@ -54,20 +50,16 @@ namespace A2
     /// Edit a journey using the provided journey and property values
     /// </summary>
     /// <param name="journey">Journey to be referenced and to be modified</param>
-    /// <param name="startDate">Start date/time of journey</param>
-    /// <param name="endDate">End date/time of journey</param>
-    /// <param name="startOdometer">Start odometer of the journey</param>
-    /// <param name="endOdometer">End odometer of the journey</param>
-    public void EditJourney( Journey journey, DateTime startDate, DateTime endDate, int startOdometer, int endOdometer)
+    /// <param name="date">Date/time of journey</param>
+    /// <param name="distance">Distance of the journey</param>
+    public void EditJourney( Journey journey, DateTime date, int distance )
     {
       var FindJourney = List.FirstOrDefault( j => j.Id == journey.Id );
 
       if ( FindJourney != null )
       {
-        FindJourney.StartDate = startDate;
-        FindJourney.EndDate = endDate;
-        FindJourney.StartOdometer = startOdometer;
-        FindJourney.EndOdometer = endOdometer;
+        FindJourney.Date = date;
+        FindJourney.Distance = distance;
       }
     }
 
@@ -85,7 +77,7 @@ namespace A2
     /// </summary>
     /// <param name="vehicle">The vehicle to retrieve the most recent journey</param>
     /// <returns>The most recent journey</returns>
-    public Journey recentJourney( Vehicle vehicle )
+    public Journey Recent( Vehicle vehicle )
     {
       Journey recentJourney = null;
 
@@ -113,7 +105,7 @@ namespace A2
       ObservableCollection<Journey> vehicleJourneys = new ObservableCollection<Journey>(
         List
           .Where(j => j.VehicleId == vehicle.Id)
-          .OrderBy(j => j.EndDate)
+          .OrderBy(j => j.Date)
           .Reverse()
           .ToList()
       );

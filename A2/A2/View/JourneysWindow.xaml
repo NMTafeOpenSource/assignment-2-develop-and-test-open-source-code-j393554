@@ -28,11 +28,8 @@
         <ListView x:Name="lvJourneys" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" SelectedItem="{Binding SelectedJourney}" SelectionChanged="LvJourneys_SelectionChanged">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Start Date" Width="150" DisplayMemberBinding="{Binding ExternalStartDate}" />
-                    <GridViewColumn Header="End Date" Width="150" DisplayMemberBinding="{Binding ExternalEndDate}" />
-                    <GridViewColumn Header="Start km" Width="50" DisplayMemberBinding="{Binding StartOdometer}" />
-                    <GridViewColumn Header="End km" Width="50" DisplayMemberBinding="{Binding EndOdometer}" />
-                    <GridViewColumn Header="Distance" Width="75" DisplayMemberBinding="{Binding Distance}" />
+                    <GridViewColumn Header="Date" Width="200" DisplayMemberBinding="{Binding ExternalDate}" />
+                    <GridViewColumn Header="Distance" Width="200" DisplayMemberBinding="{Binding Distance}" />
                 </GridView>
             </ListView.View>
         </ListView>
@@ -41,17 +38,13 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
-                    <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="7*"/>
                 </Grid.ColumnDefinitions>
-                <Label Content="Start" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Height="26" Width="35"/>
-                <TextBox x:Name="tbStartOdometer" Grid.Column="1" Height="23" Margin="10,0,10,0" TextWrapping="Wrap" VerticalAlignment="Center" />
-
-                <Label Content="End" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Height="26" Width="35" Grid.Row="1"/>
-                <TextBox x:Name="tbEndOdometer" Grid.Column="1" Height="23" Margin="10,0,10,0" TextWrapping="Wrap" VerticalAlignment="Center" Grid.Row="1" />
+                <Label Content="kms" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Height="26" Width="35"/>
+                <TextBox x:Name="tbDistance" Grid.Column="1" Height="23" Margin="10,0,10,0" TextWrapping="Wrap" VerticalAlignment="Center" />
             </Grid>
         </GroupBox>
 
@@ -59,17 +52,13 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
-                    <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="8*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="Start" HorizontalAlignment="Left" Margin="10,0,10,0" VerticalAlignment="Center" Height="26" Width="35"/>
-                <xctk:DateTimePicker x:Name="dtpStartDate" Grid.Column="1" Margin="10,0,10,0" VerticalAlignment="Center"/>
-
-                <Label Content="End" HorizontalAlignment="Left" Margin="10,0,10,0" VerticalAlignment="Center" Height="26" Width="35" Grid.Row="1"/>
-                <xctk:DateTimePicker x:Name="dtpEndDate" Grid.Column="1" Margin="10,0,10,0" Grid.Row="1" VerticalAlignment="Center"/>
+                <xctk:DateTimePicker x:Name="dtpDate" Grid.Column="1" Margin="10,0,10,0" VerticalAlignment="Center"/>
             </Grid>
         </GroupBox>
 

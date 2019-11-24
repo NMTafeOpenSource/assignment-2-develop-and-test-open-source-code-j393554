@@ -20,7 +20,7 @@ namespace A2
   /// </summary>
   public partial class JourneysWindow : Window
   {
-    Journeys journeys;
+    readonly Journeys journeys;
     ObservableCollection<Journey> filteredJourneys;
     Journey selected;
     readonly Vehicle vehicle;
@@ -53,10 +53,8 @@ namespace A2
     /// <param name="enable"></param>
     private void ToggleEditMode( bool enable )
     {
-      dtpStartDate.IsEnabled = enable;
-      dtpEndDate.IsEnabled = enable;
-      tbStartOdometer.IsEnabled = enable;
-      tbEndOdometer.IsEnabled = enable;
+      dtpDate.IsEnabled = enable;
+      tbDistance.IsEnabled = enable;
 
       btnSave.IsEnabled = enable;
       btnDelete.IsEnabled = enable;
@@ -81,7 +79,6 @@ namespace A2
         btnCancel.Visibility = Visibility.Visible;
 
         SetSelectedToFields( true );
-        PrefillNewJourneyFields();
       }
       else
       {
@@ -92,11 +89,8 @@ namespace A2
         SetSelectedToFields( true );
       }
 
-      tbStartOdometer.IsEnabled = enable;
-      tbEndOdometer.IsEnabled = enable;
-      
-      dtpStartDate.IsEnabled = enable;
-      dtpEndDate.IsEnabled = enable;
+      tbDistance.IsEnabled = enable;
+      dtpDate.IsEnabled = enable;
 
       btnSave.IsEnabled = false;
       btnDelete.IsEnabled = false;
@@ -110,36 +104,14 @@ namespace A2
     {
       if ( empty )
       {
-        dtpStartDate.Value = null;
-        dtpEndDate.Value = null;
-        tbStartOdometer.Text = null;
-        tbEndOdometer.Text = null;
+        dtpDate.Value = null;
+        tbDistance.Text = null;
       }
       else
       {
-        dtpStartDate.Value = selected.StartDate;
-        dtpEndDate.Value = selected.EndDate;
-        tbStartOdometer.Text = selected.StartOdometer.ToString();
-        tbEndOdometer.Text = selected.EndOdometer.ToString();
+        dtpDate.Value = selected.Date;
+        tbDistance.Text = selected.Distance.ToString();
       }
-    }
-
-    private void PrefillNewJourneyFields()
-    {
-      Journey RecentJourney = journeys.recentJourney( vehicle );
-      string Odometer;
-      
-      if ( RecentJourney != null )
-      {
-        Odometer = RecentJourney.EndOdometer.ToString();
-      }
-      else
-      {
-        Odometer = vehicle.Odometer.ToString();
-      }
-
-      tbStartOdometer.Text = Odometer;
-      tbEndOdometer.Text = Odometer;
     }
 
     /// <summary>
@@ -148,10 +120,8 @@ namespace A2
     private void CollateFields()
     {
       fields = new List<Control>(new Control[] {
-        tbStartOdometer,
-        tbEndOdometer,
-        dtpStartDate,
-        dtpEndDate
+        tbDistance,
+        dtpDate,
       });
     }
 
@@ -170,7 +140,7 @@ namespace A2
         bool fieldFailedValidation = false;
 
         // Integers
-        if (field.Name == "tbStartOdometer" || field.Name == "tbEndOdometer")
+        if (field.Name == "tbDistance")
         {
           TextBox castedField = (TextBox)field;
 
@@ -200,29 +170,6 @@ namespace A2
         {
           valid = false;
           field.BorderBrush = Brushes.Red;
-        }
-      }
-
-      // Additional checks that cannot be sanely validated by checking every field but seemingly all valid
-      if ( valid )
-      {
-        int.TryParse(tbStartOdometer.Text, out int start);
-        int.TryParse(tbEndOdometer.Text, out int end);
-
-        // Start odometer can't be greater than end odometer.
-        if ( start > end )
-        {
-          tbStartOdometer.BorderBrush = Brushes.Red;
-          tbEndOdometer.BorderBrush = Brushes.Red;
-          valid = false;
-        }
-
-        // Start date can't be greater than end date
-        if ( dtpStartDate.Value > dtpEndDate.Value )
-        {
-          dtpStartDate.BorderBrush = Brushes.Red;
-          dtpEndDate.BorderBrush = Brushes.Red;
-          valid = false;
         }
       }
 
@@ -256,10 +203,8 @@ namespace A2
         {
           journeys.Add(
             vehicle,
-            (DateTime)dtpStartDate.Value,
-            (DateTime)dtpEndDate.Value,
-            int.Parse(tbStartOdometer.Text),
-            int.Parse(tbEndOdometer.Text)
+            (DateTime)dtpDate.Value,
+            int.Parse(tbDistance.Text)
           );
 
           changes = true;
@@ -277,7 +222,7 @@ namespace A2
     {
       if (ValidateFields())
       {
-        journeys.EditJourney( selected, (DateTime) dtpStartDate.Value, (DateTime) dtpEndDate.Value, int.Parse( tbStartOdometer.Text ), int.Parse( tbEndOdometer.Text ) );
+        journeys.EditJourney( selected, (DateTime) dtpDate.Value, int.Parse( tbDistance.Text ) );
         Refresh();
         changes = true;
 

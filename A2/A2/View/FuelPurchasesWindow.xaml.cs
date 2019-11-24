@@ -21,7 +21,7 @@ namespace A2
   /// </summary>
   public partial class FuelPurchasesWindow : Window
   {
-    FuelPurchases fuelPurchases;
+    readonly FuelPurchases fuelPurchases;
     ObservableCollection<FuelPurchase> filtered;
     FuelPurchase selected;
     readonly Vehicle vehicle;

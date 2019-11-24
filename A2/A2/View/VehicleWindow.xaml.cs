@@ -45,8 +45,6 @@ namespace A2
       this.fuelPurchases = fuelPurchases;
       this.services = services;
 
-      tbOdometerCurrent.IsEnabled = false;
-
       CollateFields();
 
       if ( addMode )
@@ -70,7 +68,7 @@ namespace A2
         tbMakeYear,
         tbRegistrationNumber,
         tbTankCapacity,
-        tbOdometerSaved
+        tbServiceLimit,
       } );
     }
 
@@ -91,7 +89,7 @@ namespace A2
         bool fieldFailedValidation = false;
 
         // Integers
-        if (castedField.Name == "tbMakeYear" || castedField.Name == "tbOdometerSaved")
+        if (castedField.Name == "tbMakeYear" || castedField.Name == "tbServiceLimit")
         {
           if ( castedField.Text == "" )
           {
@@ -172,7 +170,6 @@ namespace A2
     {
       int odometer = CalculateDistanceTraveled();
       tbOdometer.Text = odometer.ToString() + " km(s)";
-      tbOdometerCurrent.Text = odometer.ToString();
     }
 
     /// <summary>
@@ -207,7 +204,7 @@ namespace A2
       tbMakeYear.IsEnabled = enable;
       tbRegistrationNumber.IsEnabled = enable;
       tbTankCapacity.IsEnabled = enable;
-      tbOdometerSaved.IsEnabled = enable;
+      tbServiceLimit.IsEnabled = enable;
 
       if (enable)
       {
@@ -216,7 +213,7 @@ namespace A2
         tbMakeYear.Text = null;
         tbRegistrationNumber.Text = null;
         tbTankCapacity.Text = null;
-        tbOdometerSaved.Text = null;
+        tbServiceLimit.Text = null;
       }
     }
 
@@ -239,7 +236,7 @@ namespace A2
       tbMakeYear.IsEnabled = enable;
       tbRegistrationNumber.IsEnabled = enable;
       tbTankCapacity.IsEnabled = enable;
-      tbOdometerSaved.IsEnabled = enable;
+      tbServiceLimit.IsEnabled = enable;
 
       editMode = enable;
     }
@@ -274,27 +271,13 @@ namespace A2
     /// </summary>
     private void SetNextService()
     {
-      int gap = vehicles.TravelServiceGap( vehicle, servicesList, journeysList );
+      int gap = vehicles.TravelServiceGap( servicesList, journeysList );
       string nextService;
       bool warning = true;
 
       tbNextService.ClearValue(ForegroundProperty);
 
-      if ( servicesList.Count == 0 )
-      {
-        // A vehicle can have no service, yet.
-        nextService = "No service information; New Vehicle";
-        warning = false;
-        
-        // But a vehicle that has no service information but its odometer is past it's service limit
-        if ( vehicle.Odometer > vehicle.ServiceLimit )
-        {
-          // Then it's due for a service.
-          nextService = "NOW";
-          warning = true;
-        }
-      }
-      else if ( gap >= vehicle.ServiceLimit )
+      if ( gap >= vehicle.ServiceLimit )
       {
         // Due for a service
         nextService = "NOW";
@@ -319,11 +302,11 @@ namespace A2
     /// </summary>
     private void SetFuelEfficiency()
     {
-      string fuelEfficiencyText = "Efficiency too low (Below 1km/l)";
+      string fuelEfficiencyText = "Efficiency too low (below 1km/l)";
       bool warning = true;
       tbFuelEfficiency.ClearValue(ForegroundProperty);
 
-      int totalOdometer = vehicles.TotalDistance( vehicle, journeysList );
+      int totalOdometer = vehicles.TotalDistance( journeysList );
       double totalFuelLitres = vehicles.TotalFuelLitres( fuelPurchasesList );
 
       double fuelEfficiency = totalOdometer / totalFuelLitres;
@@ -335,7 +318,7 @@ namespace A2
       }
       else if ( fuelEfficiency > 1 )
       {
-        fuelEfficiencyText = Math.Round( fuelEfficiency, 2 ) + " km(s) / l";
+        fuelEfficiencyText = Math.Round( fuelEfficiency, 2 ) + " km(s)/l";
         warning = false;
       }
 
@@ -371,7 +354,7 @@ namespace A2
             int.Parse(tbMakeYear.Text),
             tbRegistrationNumber.Text,
             double.Parse(tbTankCapacity.Text),
-            int.Parse(tbOdometerSaved.Text)
+            int.Parse(tbServiceLimit.Text)
           );
 
           vehicle = vehicles.List.Last();
@@ -407,7 +390,7 @@ namespace A2
         MakeYear = vehicle.MakeYear,
         RegistrationNumber = vehicle.RegistrationNumber,
         TankCapacity = vehicle.TankCapacity,
-        Odometer = vehicle.Odometer
+        ServiceLimit = vehicle.ServiceLimit
       };
     }
 
@@ -439,7 +422,7 @@ namespace A2
     {
       ServicesWindow ServicesWindow;
 
-      ServicesWindow = new ServicesWindow( services, vehicle, journeys, false )
+      ServicesWindow = new ServicesWindow( services, vehicle, false )
       {
         Owner = this,
       };
@@ -483,7 +466,7 @@ namespace A2
         vehicleReference.MakeYear = clonedVehicle.MakeYear;
         vehicleReference.RegistrationNumber = clonedVehicle.RegistrationNumber;
         vehicleReference.TankCapacity = clonedVehicle.TankCapacity;
-        vehicleReference.Odometer = clonedVehicle.Odometer;
+        vehicleReference.ServiceLimit = clonedVehicle.ServiceLimit;
 
         ( ( MainWindow ) Owner ).Refresh();
       }
