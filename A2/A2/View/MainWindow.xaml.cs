@@ -52,6 +52,9 @@ namespace A2
       Services.Add( Vehicles.List[0], 92950, 537.20m, new DateTime(2019, 3, 16) );
     }
 
+    /// <summary>
+    /// Refreshes all information shown on the window.
+    /// </summary>
     public void Refresh()
     {
       string selectedVehicleOdometer;
@@ -82,6 +85,10 @@ namespace A2
       tbOdometer.Text = selectedVehicleOdometer;
     }
 
+    /// <summary>
+    /// Sets vehicle property (fuel purchases, journeys, services) buttons to a state. Can be toggled.
+    /// </summary>
+    /// <param name="enable">True to enable property buttons, otherwise false</param>
     private void SetVehiclePropertyButtons( bool enable = true )
     {
       BtnFuelPurchases.IsEnabled = enable;
@@ -119,13 +126,13 @@ namespace A2
       ServicesWindow.ShowDialog();
     }
 
-    private void lvVehicles_SelectionChanged( object sender, SelectionChangedEventArgs e )
+    private void LvVehicles_SelectionChanged( object sender, SelectionChangedEventArgs e )
     {
       Refresh();
       btnView.IsEnabled = true;
     }
 
-    private void btnView_Click( object sender, RoutedEventArgs e )
+    private void BtnView_Click( object sender, RoutedEventArgs e )
     {
       VehicleWindow vehicleWindow = new VehicleWindow( Journeys, FuelPurchases, Services, false )
       {
@@ -136,7 +143,7 @@ namespace A2
       vehicleWindow.ShowDialog();
     }
 
-    private void btnAdd_Click( object sender, RoutedEventArgs e )
+    private void BtnAdd_Click( object sender, RoutedEventArgs e )
     {
       VehicleWindow vehicleWindow = new VehicleWindow(Journeys, FuelPurchases, Services, true)
       {

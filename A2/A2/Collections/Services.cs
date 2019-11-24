@@ -18,11 +18,21 @@ namespace A2
       Load();
     }
 
+    /// <summary>
+    /// Load fuel purchases from database;
+    /// </summary>
     public void Load()
     {
       // TODO: Load Journeys with SQL Statement
     }
 
+    /// <summary>
+    /// Add a service into the collection
+    /// </summary>
+    /// <param name="vehicle">Vehicle to be referenced on this service</param>
+    /// <param name="odometer">The odometer of the vehicle when serviced</param>
+    /// <param name="cost">Cost of service. Up to 2 decimal points</param>
+    /// <param name="date">Date of service</param>
     public void Add( Vehicle vehicle, int odometer, decimal cost, DateTime date )
     {
       int id = FindId();
@@ -37,6 +47,13 @@ namespace A2
       );
     }
 
+    /// <summary>
+    /// Edit an existing service
+    /// </summary>
+    /// <param name="service">The service to be referenced and to be modified</param>
+    /// <param name="odometer">The odometer of the vehicle when serviced</param>
+    /// <param name="cost">Cost of service. Up to 2 decimal points</param>
+    /// <param name="date">Date of service</param>
     public void Edit( Service service, int odometer, decimal cost, DateTime date )
     {
       var FoundService = List.FirstOrDefault(i => i.Id == service.Id);
@@ -54,6 +71,11 @@ namespace A2
       List.Remove( service );
     }
 
+    /// <summary>
+    /// Retrieves the most recent service
+    /// </summary>
+    /// <param name="vehicle">The vehicle to retrieve the most recent service</param>
+    /// <returns>The most recent service</returns>
     public Service Recent( Vehicle vehicle )
     {
       Service RecentService = null;
@@ -72,9 +94,14 @@ namespace A2
       return RecentService;
     }
 
+    /// <summary>
+    /// Retrieves services by a supplied vehicle.
+    /// </summary>
+    /// <param name="vehicle">The vehicle to retrieve all services</param>
+    /// <returns>An ObservableCollection of the services by the vehicle passed</returns>
     public ObservableCollection<Service> ByVehicle( Vehicle vehicle )
     {
-      ObservableCollection<Service> VehicleServices = new ObservableCollection<Service>(
+      ObservableCollection<Service> vehicleServices = new ObservableCollection<Service>(
         List
           .Where(i => i.VehicleId == vehicle.Id)
           .OrderBy(i => i.Odometer)
@@ -82,15 +109,24 @@ namespace A2
           .ToList()
       );
 
-      return VehicleServices;
+      return vehicleServices;
     }
 
+    /// <summary>
+    /// Finds the most recent and suitable ID to be used for a new item.
+    /// </summary>
+    /// <returns>Most suitable ID to be used next for a new item.</returns>
     public int FindId()
     {
       int id;
       int tail;
 
-      tail = List.Count;
+      // Sort list by ID
+      ObservableCollection<Service> listSortedID = new ObservableCollection<Service>(
+        List.OrderBy(j => j.Id).ToList()
+      );
+
+      tail = listSortedID.Count;
 
       if (tail == 0)
       {
@@ -99,7 +135,7 @@ namespace A2
       else
       {
         tail--;
-        id = List[tail].Id + 1;
+        id = listSortedID[tail].Id + 1;
       }
 
       return id;

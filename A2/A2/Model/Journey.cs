@@ -10,7 +10,14 @@ namespace A2
   public class Journey
   {
     public int Id { get; private set; }
-    public int VehicleId { get; private set; }
+    private readonly Vehicle vehicle;
+    public int VehicleId
+    {
+      get
+      {
+        return vehicle.Id;
+      }
+    }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public int StartOdometer { get; set; }
@@ -41,8 +48,8 @@ namespace A2
 
     public Journey( int id, Vehicle vehicle )
     {
+      this.vehicle = vehicle;
       Id = id;
-      VehicleId = vehicle.Id;
     }
   }
 }

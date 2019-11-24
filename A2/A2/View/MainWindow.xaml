@@ -27,7 +27,7 @@
             <RowDefinition/>
             <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
-        <ListView x:Name="lvVehicles" Grid.RowSpan="7" ItemsSource="{Binding List}" Grid.Row="1" Grid.Column="1" SelectionChanged="lvVehicles_SelectionChanged" >
+        <ListView x:Name="lvVehicles" Grid.RowSpan="7" ItemsSource="{Binding List}" Grid.Row="1" Grid.Column="1" SelectionChanged="LvVehicles_SelectionChanged" >
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Manufacturer" DisplayMemberBinding="{Binding Manufacturer}" Width="80" />
@@ -132,7 +132,7 @@
             </Grid>
         </GroupBox>
         
-        <Button x:Name="btnAdd" Content="Add Vehicle" HorizontalAlignment="Left" Grid.Row="9" VerticalAlignment="Center" Width="75" Grid.Column="1" Click="btnAdd_Click"/>
-        <Button x:Name="btnView" Content="View Vehicle" HorizontalAlignment="Left" Grid.Row="9" VerticalAlignment="Center" Width="75" Grid.Column="1" Margin="80,0,0,0" Click="btnView_Click"/>
+        <Button x:Name="btnAdd" Content="Add Vehicle" HorizontalAlignment="Left" Grid.Row="9" VerticalAlignment="Center" Width="75" Grid.Column="1" Click="BtnAdd_Click"/>
+        <Button x:Name="btnView" Content="View Vehicle" HorizontalAlignment="Left" Grid.Row="9" VerticalAlignment="Center" Width="75" Grid.Column="1" Margin="80,0,0,0" Click="BtnView_Click"/>
     </Grid>
 </Window>

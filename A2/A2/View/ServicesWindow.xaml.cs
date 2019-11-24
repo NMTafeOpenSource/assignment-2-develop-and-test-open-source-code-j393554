@@ -29,13 +29,20 @@ namespace A2
       this.isParentMain = isParentMain;
     }
 
-    private void RefreshList()
+    /// <summary>
+    /// Refreshes list by re-grouping items that belong to vehicle and refresh list view.
+    /// </summary>
+    private void Refresh()
     {
       filtered = services.ByVehicle( vehicle );
       lvItems.ItemsSource = filtered;
       CollectionViewSource.GetDefaultView( lvItems.ItemsSource ).Refresh();
     }
 
+    /// <summary>
+    /// Enables Add Mode, blocking out buttons, fields and blanking them. Can be toggled.
+    /// </summary>
+    /// <param name="enable"></param>
     private void ToggleAddMode( bool enable )
     {
       addMode = enable;
@@ -63,9 +70,12 @@ namespace A2
       ToggleEditFields(enable);
     }
 
+    /// <summary>
+    /// Prefill's fields based on information of a vehicle or its journeys
+    /// </summary>
     private void PrefillNewItemFields()
     {
-      Journey recentJourney = journeys.RecentJourney( vehicle );
+      Journey recentJourney = journeys.recentJourney( vehicle );
       string Odometer;
 
       if (recentJourney != null)
@@ -80,6 +90,10 @@ namespace A2
       tbOdometer.Text = Odometer;
     }
 
+    /// <summary>
+    /// Enables Edit mode, blocking out buttons, fields and blanking them. Can be toggled.
+    /// </summary>
+    /// <param name="enable"></param>
     private void ToggleEditFields( bool enable )
     {
       tbOdometer.IsEnabled = enable;
@@ -87,6 +101,10 @@ namespace A2
       dpDate.IsEnabled = enable;
     }
 
+    /// <summary>
+    /// On change of selection in list view, update information shown in grouped fields.
+    /// </summary>
+    /// <param name="empty">True to empty fields, otherwise false to leave alone.</param>
     private void SetSelectedToFields( bool empty = false )
     {
       if (empty)
@@ -103,7 +121,7 @@ namespace A2
       }
     }
 
-    private void btnAdd_Click( object sender, RoutedEventArgs e )
+    private void BtnAdd_Click( object sender, RoutedEventArgs e )
     {
       if (editMode)
       {
@@ -123,25 +141,25 @@ namespace A2
         changes = true;
 
         // Refresh list
-        RefreshList();
+        Refresh();
       }
 
       ToggleAddMode(addMode ? false : true);
     }
 
-    private void btnSave_Click( object sender, RoutedEventArgs e )
+    private void BtnSave_Click( object sender, RoutedEventArgs e )
     {
       services.Edit( selected, int.Parse( tbOdometer.Text ), decimal.Parse( tbCost.Text ), ( DateTime ) dpDate.SelectedDate );
-      RefreshList();
+      Refresh();
       changes = true;
     }
 
-    private void btnDelete_Click( object sender, RoutedEventArgs e )
+    private void BtnDelete_Click( object sender, RoutedEventArgs e )
     {
       services.Delete( selected );
       SetSelectedToFields(true);
       ToggleEditFields( false );
-      RefreshList();
+      Refresh();
       editMode = false;
       btnSave.IsEnabled = false;
       btnDelete.IsEnabled = false;
@@ -149,12 +167,12 @@ namespace A2
       changes = true;
     }
 
-    private void btnCancel_Click( object sender, RoutedEventArgs e )
+    private void BtnCancel_Click( object sender, RoutedEventArgs e )
     {
       ToggleAddMode( false );
     }
 
-    private void lvItems_SelectionChanged( object sender, SelectionChangedEventArgs e )
+    private void LvItems_SelectionChanged( object sender, SelectionChangedEventArgs e )
     {
       if (lvItems.SelectedItem is Service)
       {
@@ -174,7 +192,7 @@ namespace A2
 
     private void Window_Loaded( object sender, RoutedEventArgs e )
     {
-      RefreshList();
+      Refresh();
       ToggleAddMode( false );
     }
 

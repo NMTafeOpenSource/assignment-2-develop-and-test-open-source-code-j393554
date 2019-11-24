@@ -16,14 +16,25 @@ namespace A2
     public Journeys()
     {
       List = new ObservableCollection<Journey>();
-      LoadJourneys();
+      Load();
     }
 
-    public void LoadJourneys()
+    /// <summary>
+    /// Load journeys from database;
+    /// </summary>
+    public void Load()
     {
       // TODO: Load Journeys with SQL Statement
     }
 
+    /// <summary>
+    /// Add new journey into the collection
+    /// </summary>
+    /// <param name="vehicle">Vehicle to be referenced on this Journey</param>
+    /// <param name="startDate">Start date/time of journey</param>
+    /// <param name="endDate">End date/time of journey</param>
+    /// <param name="startOdometer">Start odometer of the journey</param>
+    /// <param name="endOdometer">End odometer of the journey</param>
     public void Add( Vehicle vehicle, DateTime startDate, DateTime endDate, int startOdometer, int endOdometer )
     {
       int id = FindId();
@@ -39,45 +50,67 @@ namespace A2
       );
     }
 
-    public void EditJourney( Journey journey, DateTime StartDate, DateTime EndDate, int StartOdometer, int EndOdometer)
+    /// <summary>
+    /// Edit a journey using the provided journey and property values
+    /// </summary>
+    /// <param name="journey">Journey to be referenced and to be modified</param>
+    /// <param name="startDate">Start date/time of journey</param>
+    /// <param name="endDate">End date/time of journey</param>
+    /// <param name="startOdometer">Start odometer of the journey</param>
+    /// <param name="endOdometer">End odometer of the journey</param>
+    public void EditJourney( Journey journey, DateTime startDate, DateTime endDate, int startOdometer, int endOdometer)
     {
       var FindJourney = List.FirstOrDefault( j => j.Id == journey.Id );
 
       if ( FindJourney != null )
       {
-        FindJourney.StartDate = StartDate;
-        FindJourney.EndDate = EndDate;
-        FindJourney.StartOdometer = StartOdometer;
-        FindJourney.EndOdometer = EndOdometer;
+        FindJourney.StartDate = startDate;
+        FindJourney.EndDate = endDate;
+        FindJourney.StartOdometer = startOdometer;
+        FindJourney.EndOdometer = endOdometer;
       }
     }
 
+    /// <summary>
+    /// Deletes a Journey
+    /// </summary>
+    /// <param name="journey">Journey to be deleted</param>
     public void DeleteJourney( Journey journey )
     {
       List.Remove( journey );
     }
 
-    public Journey RecentJourney( Vehicle vehicle )
+    /// <summary>
+    /// Retrieves the most recent journey
+    /// </summary>
+    /// <param name="vehicle">The vehicle to retrieve the most recent journey</param>
+    /// <returns>The most recent journey</returns>
+    public Journey recentJourney( Vehicle vehicle )
     {
-      Journey RecentJourney = null;
+      Journey recentJourney = null;
 
       if ( List.Count > 0 )
       {
         // Group Services by Vehicle ID.
-        ObservableCollection<Journey> VehicleJourneys = ByVehicle( vehicle );
+        ObservableCollection<Journey> vehicleJourneys = ByVehicle( vehicle );
       
-        if ( VehicleJourneys.Count > 0 )
+        if ( vehicleJourneys.Count > 0 )
         {
-          RecentJourney = VehicleJourneys[0];
+          recentJourney = vehicleJourneys[0];
         }
       }
 
-      return RecentJourney;
+      return recentJourney;
     }
 
+    /// <summary>
+    /// Retrieves journeys by a supplied vehicle.
+    /// </summary>
+    /// <param name="vehicle">The vehicle to retrieve all journeys</param>
+    /// <returns>An ObservableCollection of the journeys by the vehicle passed</returns>
     public ObservableCollection<Journey> ByVehicle( Vehicle vehicle )
     {
-      ObservableCollection<Journey> VehicleJourneys = new ObservableCollection<Journey>(
+      ObservableCollection<Journey> vehicleJourneys = new ObservableCollection<Journey>(
         List
           .Where(j => j.VehicleId == vehicle.Id)
           .OrderBy(j => j.EndDate)
@@ -85,15 +118,24 @@ namespace A2
           .ToList()
       );
 
-      return VehicleJourneys;
+      return vehicleJourneys;
     }
 
+    /// <summary>
+    /// Finds the most recent and suitable ID to be used for a new item.
+    /// </summary>
+    /// <returns>Most suitable ID to be used next for a new item.</returns>
     public int FindId()
     {
       int id;
       int tail;
 
-      tail = List.Count;
+      // Sort list by ID
+      ObservableCollection<Journey> listSortedID = new ObservableCollection<Journey>(
+        List.OrderBy(j => j.Id).ToList()
+      );
+
+      tail = listSortedID.Count;
 
       if (tail == 0)
       {
@@ -102,7 +144,7 @@ namespace A2
       else
       {
         tail--;
-        id = List[tail].Id + 1;
+        id = listSortedID[tail].Id + 1;
       }
 
       return id;

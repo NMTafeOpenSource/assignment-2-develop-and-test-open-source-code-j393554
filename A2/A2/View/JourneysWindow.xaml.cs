@@ -20,7 +20,7 @@ namespace A2
   /// </summary>
   public partial class JourneysWindow : Window
   {
-    Journeys journeysVM;
+    Journeys journeys;
     ObservableCollection<Journey> filteredJourneys;
     Journey selectedJourney;
     readonly Vehicle vehicle;
@@ -30,17 +30,24 @@ namespace A2
     {
       InitializeComponent();
       this.vehicle = vehicle;
-      this.journeysVM = journeysVM;
+      this.journeys = journeysVM;
       this.isParentMain = isParentMain;
     }
 
-    private void RefreshJourneyList()
+    /// <summary>
+    /// Refreshes list by re-grouping items that belong to vehicle and refresh list view.
+    /// </summary>
+    private void RefreshList()
     {
-      filteredJourneys = journeysVM.ByVehicle(vehicle);
+      filteredJourneys = journeys.ByVehicle(vehicle);
       lvJourneys.ItemsSource = filteredJourneys;
       CollectionViewSource.GetDefaultView(lvJourneys.ItemsSource).Refresh();
     }
 
+    /// <summary>
+    /// Enables Edit mode, blocking out buttons, fields and blanking them. Can be toggled.
+    /// </summary>
+    /// <param name="enable"></param>
     private void ToggleEditFields( bool enable )
     {
       dtpStartDate.IsEnabled = enable;
@@ -49,6 +56,10 @@ namespace A2
       tbEndOdometer.IsEnabled = enable;
     }
 
+    /// <summary>
+    /// Enables Add Mode, blocking out buttons, fields and blanking them. Can be toggled.
+    /// </summary>
+    /// <param name="enable"></param>
     private void ToggleAddMode( bool enable )
     {
       addMode = enable;
@@ -76,6 +87,10 @@ namespace A2
       ToggleEditFields( enable );
     }
 
+    /// <summary>
+    /// On change of selection in list view, update information shown in grouped fields.
+    /// </summary>
+    /// <param name="empty">True to empty fields, otherwise false to leave alone.</param>
     private void SetSelectedToFields( bool empty = false )
     {
       if ( empty )
@@ -96,7 +111,7 @@ namespace A2
 
     private void PrefillNewJourneyFields()
     {
-      Journey RecentJourney = journeysVM.RecentJourney( vehicle );
+      Journey RecentJourney = journeys.recentJourney( vehicle );
       string Odometer;
       
       if ( RecentJourney != null )
@@ -112,7 +127,7 @@ namespace A2
       tbEndOdometer.Text = Odometer;
     }
 
-    private void lvJourneys_SelectionChanged( object sender, SelectionChangedEventArgs e )
+    private void LvJourneys_SelectionChanged( object sender, SelectionChangedEventArgs e )
     {
       if ( lvJourneys.SelectedItem is Journey )
       {
@@ -131,7 +146,7 @@ namespace A2
       }
     }
 
-    private void btnAdd_Click( object sender, RoutedEventArgs e )
+    private void BtnAdd_Click( object sender, RoutedEventArgs e )
     {
       if (editMode)
       {
@@ -141,7 +156,7 @@ namespace A2
       if (addMode)
       {
         // TODO: Validate
-        journeysVM.Add(
+        journeys.Add(
           vehicle,
           (DateTime)dtpStartDate.Value,
           (DateTime)dtpEndDate.Value,
@@ -152,25 +167,25 @@ namespace A2
         changes = true;
 
         // Refresh list
-        RefreshJourneyList();
+        RefreshList();
       }
 
       ToggleAddMode(addMode ? false : true);
     }
     
-    private void btnSave_Click( object sender, RoutedEventArgs e )
+    private void BtnSave_Click( object sender, RoutedEventArgs e )
     {
-      journeysVM.EditJourney( selectedJourney, (DateTime) dtpStartDate.Value, (DateTime) dtpEndDate.Value, int.Parse( tbStartOdometer.Text ), int.Parse( tbEndOdometer.Text ) );
-      RefreshJourneyList();
+      journeys.EditJourney( selectedJourney, (DateTime) dtpStartDate.Value, (DateTime) dtpEndDate.Value, int.Parse( tbStartOdometer.Text ), int.Parse( tbEndOdometer.Text ) );
+      RefreshList();
       changes = true;
     }
 
-    private void btnDelete_Click( object sender, RoutedEventArgs e )
+    private void BtnDelete_Click( object sender, RoutedEventArgs e )
     {
-      journeysVM.DeleteJourney( selectedJourney );
+      journeys.DeleteJourney( selectedJourney );
       SetSelectedToFields( true );
       ToggleEditFields( false );
-      RefreshJourneyList();
+      RefreshList();
       editMode = false;
       btnSave.IsEnabled = false;
       btnDelete.IsEnabled = false;
@@ -178,14 +193,14 @@ namespace A2
       changes = true;
     }
     
-    private void btnCancel_Click( object sender, RoutedEventArgs e )
+    private void BtnCancel_Click( object sender, RoutedEventArgs e )
     {
       ToggleAddMode(false);
     }
     
     private void Window_Loaded( object sender, RoutedEventArgs e )
     {
-      RefreshJourneyList();
+      RefreshList();
       ToggleAddMode(false);
     }
 

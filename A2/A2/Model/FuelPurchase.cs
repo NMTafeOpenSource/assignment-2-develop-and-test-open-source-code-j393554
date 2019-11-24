@@ -9,9 +9,6 @@ namespace A2
   public class FuelPurchase
   {
     public int Id { get; private set; }
-    public double Litres { get; set; }
-    public decimal Cost { get; set; }
-    public DateTime Date { get; set; }
     public int VehicleId
     {
       get
@@ -19,8 +16,10 @@ namespace A2
         return vehicle.Id;
       }
     }
-
     private readonly Vehicle vehicle;
+    public double Litres { get; set; }
+    public decimal Cost { get; set; }
+    public DateTime Date { get; set; }
 
     public FuelPurchase( int id, Vehicle vehicle )
     {

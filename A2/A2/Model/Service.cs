@@ -9,14 +9,12 @@ namespace A2
   public class Service
   {
     public int Id { get; private set; }
+    private readonly Vehicle vehicle;
     public int VehicleId {
       get {
         return vehicle.Id;
       }
     }
-
-    private readonly Vehicle vehicle;
-
     public int Odometer { get; set; }
     public decimal Cost { get; set; }
     public DateTime Date { get; set; }

@@ -25,7 +25,7 @@
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
 
-        <ListView x:Name="lvJourneys" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" SelectedItem="{Binding SelectedJourney}" SelectionChanged="lvJourneys_SelectionChanged">
+        <ListView x:Name="lvJourneys" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" SelectedItem="{Binding SelectedJourney}" SelectionChanged="LvJourneys_SelectionChanged">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Start Date" Width="150" DisplayMemberBinding="{Binding ExternalStartDate}" />
@@ -73,9 +73,9 @@
             </Grid>
         </GroupBox>
 
-        <Button x:Name="btnAdd" Content="Add New Journey" HorizontalAlignment="Left" VerticalAlignment="Center" Width="115" Grid.Column="1" Grid.Row="5" Click="btnAdd_Click"/>
-        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Center" Width="50" Grid.Column="1" Grid.Row="5" Click="btnCancel_Click" Margin="120,0,0,0"/>
-        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Right"  VerticalAlignment="Center" Width="75" Grid.Column="3" Grid.Row="5" Margin="0,0,80,0" Click="btnSave_Click" IsEnabled="False"/>
-        <Button x:Name="btnDelete" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Center" Width="75" Grid.Column="3" Grid.Row="5" Click="btnDelete_Click" IsEnabled="False"/>
+        <Button x:Name="btnAdd" Content="Add New Journey" HorizontalAlignment="Left" VerticalAlignment="Center" Width="115" Grid.Column="1" Grid.Row="5" Click="BtnAdd_Click"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Center" Width="50" Grid.Column="1" Grid.Row="5" Click="BtnCancel_Click" Margin="120,0,0,0"/>
+        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Right"  VerticalAlignment="Center" Width="75" Grid.Column="3" Grid.Row="5" Margin="0,0,80,0" Click="BtnSave_Click" IsEnabled="False"/>
+        <Button x:Name="btnDelete" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Center" Width="75" Grid.Column="3" Grid.Row="5" Click="BtnDelete_Click" IsEnabled="False"/>
     </Grid>
 </Window>

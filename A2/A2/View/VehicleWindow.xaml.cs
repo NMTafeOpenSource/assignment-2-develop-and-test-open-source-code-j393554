@@ -53,6 +53,10 @@ namespace A2
       }
     }
 
+    /// <summary>
+    /// Refreshes information shown in the window. Also resets datacontexts
+    /// </summary>
+    /// <param name="metaChanged">Set to true to notify parent window (MainWindow) of changes</param>
     public void Refresh( bool metaChanged = false )
     {
       SetDataContexts();
@@ -60,6 +64,7 @@ namespace A2
       SetNextService();
       SetFuelEfficiency();
 
+      // Refresh binding of tbName since MVVM is not implemented
       tbName.GetBindingExpression( TextBlock.TextProperty ).UpdateTarget();
 
       if ( metaChanged )
@@ -68,6 +73,9 @@ namespace A2
       }
     }
 
+    /// <summary>
+    /// Update large and visible odometer to reflect actual travelled distance
+    /// </summary>
     private void UpdateOdometer()
     {
       int odometer = CalculateDistanceTraveled();
@@ -75,6 +83,10 @@ namespace A2
       tbOdometerCurrent.Text = odometer.ToString();
     }
 
+    /// <summary>
+    /// Calculates distance travelled by vehicle by counting distance travelled on all journeys
+    /// </summary>
+    /// <returns></returns>
     private int CalculateDistanceTraveled()
     {
       int odometer;
@@ -82,6 +94,10 @@ namespace A2
       return odometer;
     }
 
+    /// <summary>
+    /// Enables Add Mode, blocking out buttons, fields and blanking them. Can be toggled.
+    /// </summary>
+    /// <param name="enable">True to enable add mode, false otherwise</param>
     private void ToggleAddMode( bool enable = true )
     {
       addMode = enable;
@@ -105,6 +121,10 @@ namespace A2
       }
     }
 
+    /// <summary>
+    /// Enables Edit mode, blocking out buttons, fields and blanking them. Can be toggled.
+    /// </summary>
+    /// <param name="enable">True to enable edit mode, false otherwise</param>
     private void ToggleEditMode( bool enable )
     {
       btnJourneys.IsEnabled = ! enable;
@@ -123,6 +143,9 @@ namespace A2
       tbOdometerSaved.IsEnabled = enable;
     }
 
+    /// <summary>
+    /// (Re)sets DataContexts of grouped sections on the window.
+    /// </summary>
     private void SetDataContexts()
     {
       journeysList = journeys.ByVehicle(vehicle);
@@ -145,6 +168,9 @@ namespace A2
       }
     }
 
+    /// <summary>
+    /// Determine next service of a vehicle and make it visible.
+    /// </summary>
     private void SetNextService()
     {
       int gap = vehicles.TravelServiceGap( vehicle, servicesList, journeysList );
@@ -177,6 +203,9 @@ namespace A2
       tbNextService.Text = nextService;
     }
 
+    /// <summary>
+    /// Determine fuel efficiency of a vehicle and make it visible
+    /// </summary>
     private void SetFuelEfficiency()
     {
       string fuelEfficiencyText = "Efficiency too low (Below 1KM/L)";
@@ -198,19 +227,19 @@ namespace A2
       tbFuelEfficiency.Text = fuelEfficiencyText;
     }
 
-    private void btnDelete_Click(object sender, RoutedEventArgs e)
+    private void BtnDelete_Click(object sender, RoutedEventArgs e)
     {
       vehicles.Delete( vehicle );
       changes = true;
       Close();
     }
 
-    private void btnBack_Click(object sender, RoutedEventArgs e)
+    private void BtnBack_Click(object sender, RoutedEventArgs e)
     {
       Close();
     }
 
-    private void btnSave_Click(object sender, RoutedEventArgs e)
+    private void BtnSave_Click(object sender, RoutedEventArgs e)
     {
       if ( addMode )
       {
@@ -240,14 +269,14 @@ namespace A2
       }
     }
 
-    private void btnEdit_Click( object sender, RoutedEventArgs e )
+    private void BtnEdit_Click( object sender, RoutedEventArgs e )
     {
       editMode = !editMode;
 
       ToggleEditMode(editMode);
     }
 
-    private void btnJourneys_Click( object sender, RoutedEventArgs e )
+    private void BtnJourneys_Click( object sender, RoutedEventArgs e )
     {
       JourneysWindow JourneysWindow;
 
@@ -259,7 +288,7 @@ namespace A2
       JourneysWindow.ShowDialog();
     }
 
-    private void btnFuelPurchases_Click( object sender, RoutedEventArgs e )
+    private void BtnFuelPurchases_Click( object sender, RoutedEventArgs e )
     {
       FuelPurchasesWindow FuelPurchasesWindow;
 
@@ -271,7 +300,7 @@ namespace A2
       FuelPurchasesWindow.ShowDialog();
     }
 
-    private void btnServices_Click( object sender, RoutedEventArgs e )
+    private void BtnServices_Click( object sender, RoutedEventArgs e )
     {
       ServicesWindow ServicesWindow;
 
