@@ -1,10 +1,13 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace A2
 {
@@ -12,19 +15,143 @@ namespace A2
   {
     public ObservableCollection<Journey> List { get; private set; }
     public ObservableCollection<Journey> SelectedVehicleJourneys { get; set; }
+    private Database database;
+    private Offline offline;
+    private readonly string fileName = "journeys.json";
 
+    /// <summary>
+    /// Collection class designed to coordinate and handle operations on a list of journeys.
+    /// </summary>
     public Journeys()
     {
       List = new ObservableCollection<Journey>();
-      Load();
     }
 
     /// <summary>
-    /// Load journeys from database;
+    /// Load Journeys from the appropriate data sources
     /// </summary>
-    public void Load()
+    /// <param name="vehicleList">List of vehicles required to match it to the journeys</param>
+    /// <param name="offline">Offline mode class capabilities</param>
+    /// <param name="database">The database resource to be used to query. If not set, class will go offline and use local datasource</param>
+    public void Load( ObservableCollection<Vehicle> vehicleList, Offline offline, Database database = null )
     {
-      // TODO: Load Journeys with SQL Statement
+      // Check if we can use a database as a resource. If not, go offline/
+      if ( database != null )
+      {
+        this.database = database;
+        this.offline = offline;
+
+        try
+        {
+          // Prepare statement for query
+          string statement = "SELECT * FROM journeys";
+
+          // Execute query
+          using (MySqlCommand sqlCommand = new MySqlCommand(statement, database.Connection))
+          {
+            DataTable DataTable = new DataTable();
+            MySqlDataAdapter DataAdapter = new MySqlDataAdapter(sqlCommand);
+            DataAdapter.Fill(DataTable);
+
+            // Map result of query into collection
+            List = MapDataTableToCollection(DataTable, vehicleList);
+
+            // Save mapped results offline
+            offline.Load(fileName);
+            SaveOffline();
+          }
+        }
+        catch (Exception exception)
+        {
+          MessageBox.Show(exception.Message);
+        }
+      }
+      else
+      {
+        this.offline = offline;
+
+        // Load last queried data from saved JSON and map to collection
+        offline.Load(fileName);
+        List = MapJsonToCollection(offline.List, vehicleList);
+      }
+    }
+
+    /// <summary>
+    /// Saves the information on this collection to JSON
+    /// </summary>
+    /// <returns>True if it was saved successfully. Otherwise false.</returns>
+    public bool SaveOffline()
+    {
+      // Watch out for empty lists that inadvertently wipe local data source.
+      if ( List.Count > 0 )
+      {
+        try
+        {
+          offline.Save(List.ToList());
+          return true;
+        }
+        catch (Exception)
+        {
+          return false;
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    /// <summary>
+    /// Maps a deserialized JSON to the class used in the collection.
+    /// </summary>
+    /// <param name="list">The list of deserialized JSON</param>
+    /// <param name="vehicleList">List of vehicles to match against the items in the list</param>
+    /// <returns>An observable collection object containing the collection of items on this collection</returns>
+    public ObservableCollection<Journey> MapJsonToCollection( List<dynamic> list, ObservableCollection<Vehicle> vehicleList )
+    {
+      ObservableCollection<Journey> newList = new ObservableCollection<Journey>();
+
+      foreach (dynamic item in list)
+      {
+        // Find vehicle as listed in VehicleId as we need a vehicle object to create an item in the collection
+        var vehicle = vehicleList.FirstOrDefault(v => v.Id == int.Parse(item.VehicleId.ToString()));
+
+        newList.Add(
+          new Journey(int.Parse(item.Id.ToString()), vehicle) {
+            Date = DateTime.Parse(item.Date.ToString()),
+            Distance = int.Parse(item.Distance.ToString())
+          }
+        );
+      }
+
+      return newList;
+    }
+
+    /// <summary>
+    /// Maps a DataTable to the class used in the collection
+    /// </summary>
+    /// <param name="dataTable">The DataTable containing the information to be match into the class used in the collection</param>
+    /// <param name="vehicleList">List of vehicles to match against the vehicle as listed in the item's VehicleId</param>
+    /// <returns>An observable collection object containing the collection of items on this collection</returns>
+    public ObservableCollection<Journey> MapDataTableToCollection( DataTable dataTable, ObservableCollection<Vehicle> vehicleList )
+    {
+      ObservableCollection<Journey> list = new ObservableCollection<Journey>();
+
+      foreach (DataRow row in dataTable.Rows)
+      {
+        // Find vehicle as listed in VehicleId as we need a vehicle object to create an item in the collection
+        var vehicle = vehicleList.FirstOrDefault(v => v.Id == int.Parse(row["vehicle_id"].ToString()));
+
+        list.Add(
+          new Journey( int.Parse(row["id"].ToString()), vehicle )
+          {
+            Date = DateTime.Parse(row["date"].ToString()),
+            Distance = int.Parse(row["distance"].ToString())
+          }
+        );
+      }
+
+      return list;
     }
 
     /// <summary>
@@ -36,14 +163,26 @@ namespace A2
     public void Add( Vehicle vehicle, DateTime date, int distance )
     {
       int id = FindId();
+      Journey journey = new Journey(id, vehicle)
+      {
+        Date = date,
+        Distance = distance,
+      };
 
-      List.Add(
-        new Journey( id, vehicle )
-        {
-          Date = date,
-          Distance = distance,
-        }
-      );
+      List.Add( journey );
+
+      // Prepare SQL query
+      string statement =
+        $"INSERT INTO `journeys` ( `id`, `vehicle_id`, `distance`, `date`)" +
+        $"VALUES (" +
+          $"{journey.Id}," +
+          $"{journey.VehicleId}," +
+          $"{journey.Distance.ToString()}," +
+          $"'{journey.Date.ToString("yyyy-MM-dd")}'" +
+        $")";
+
+        // Execute statement if able
+        ExecuteNonQuery(statement);
     }
 
     /// <summary>
@@ -60,6 +199,16 @@ namespace A2
       {
         FindJourney.Date = date;
         FindJourney.Distance = distance;
+
+        string statement =
+          $"UPDATE `journeys`" +
+          $"SET " +
+            $"`distance` = {journey.Distance.ToString()}, " +
+            $"`date` = '{journey.Date.ToString("yyyy-MM-dd")}'" +
+          $"WHERE `id` = {journey.Id.ToString()};";
+
+          // Execute statement if able
+          ExecuteNonQuery(statement);
       }
     }
 
@@ -70,6 +219,13 @@ namespace A2
     public void Delete( Journey journey )
     {
       List.Remove( journey );
+
+      string statement =
+        $"DELETE FROM `journeys`" +
+        $"WHERE `id` = {journey.Id.ToString()};";
+
+      // Execute statement if able
+      ExecuteNonQuery(statement);
     }
 
     /// <summary>
@@ -111,6 +267,39 @@ namespace A2
       );
 
       return vehicleJourneys;
+    }
+
+    /// <summary>
+    /// Executes an SQL statement where a response is not expected.
+    /// </summary>
+    /// <param name="statement">The statement to execute</param>
+    /// <returns>True if statement was successfully run, false otherwise.</returns>
+    private bool ExecuteNonQuery( string statement )
+    {
+      if (database == null)
+      {
+        return false;
+      }
+
+      try
+      {
+        database.Open();
+
+        using (MySqlCommand query = new MySqlCommand(statement, database.Connection))
+        {
+          query.ExecuteNonQuery();
+        }
+
+        return true;
+      }
+      catch (MySqlException)
+      {
+        return false;
+      }
+      finally
+      {
+        database.Close();
+      }
     }
 
     /// <summary>

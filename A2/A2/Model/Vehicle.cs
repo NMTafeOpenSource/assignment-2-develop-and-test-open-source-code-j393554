@@ -38,6 +38,10 @@ namespace A2
       }
     }
 
+    /// <summary>
+    /// Vehicle class. What else is there to say?
+    /// </summary>
+    /// <param name="id">Id to be used for this vehicle.</param>
     public Vehicle( int id )
     {
       Id = id;

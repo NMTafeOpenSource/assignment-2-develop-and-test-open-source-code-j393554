@@ -37,6 +37,8 @@ namespace A2
 
     bool addMode = false, editMode = false, changes = false;
 
+    public bool Online = false;
+
     public VehicleWindow( Journeys journeys, FuelPurchases fuelPurchases, Services services, bool addMode = true )
     {
       InitializeComponent();
@@ -250,18 +252,22 @@ namespace A2
       fuelPurchasesList = fuelPurchases.ByVehicle(vehicle);
       servicesList = services.ByVehicle(vehicle);
 
+      // Consequence of not having MVVM: have to null DataContext and assign the expected DataContext for changes to mitigate
       if ( journeysList.Count > 0 )
       {
+        gbJourney.DataContext = null;
         gbJourney.DataContext = journeysList[0];
       }
 
       if ( fuelPurchasesList.Count > 0 )
       {
+        gbFuelPurchase.DataContext = null;
         gbFuelPurchase.DataContext = fuelPurchasesList[0];
       }
 
       if ( servicesList.Count > 0 )
       {
+        gbRecentService.DataContext = null;
         gbRecentService.DataContext = servicesList[0];
       }
     }
@@ -436,15 +442,34 @@ namespace A2
       vehicles = ((MainWindow)Owner).Vehicles;
       Refresh();
 
-      if (addMode)
+      Online = ((MainWindow)Owner).Online;
+
+      if ( Online )
       {
-        ToggleEditMode(false);
-        ToggleAddMode(true);
+        if (addMode)
+        {
+          ToggleEditMode(false);
+          ToggleAddMode(true);
+        }
+        else
+        {
+          ToggleAddMode(false);
+          ToggleEditMode(false);
+        }
       }
       else
       {
         ToggleAddMode(false);
         ToggleEditMode(false);
+
+        foreach (Control field in fields)
+        {
+          field.IsEnabled = false;
+        }
+
+        btnDelete.IsEnabled = false;
+        btnSave.IsEnabled = false;
+        btnEdit.IsEnabled = false;
       }
     }
 

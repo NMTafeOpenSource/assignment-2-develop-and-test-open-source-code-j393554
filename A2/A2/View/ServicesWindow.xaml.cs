@@ -18,7 +18,7 @@ namespace A2
     ObservableCollection<Service> filtered;
     Service selected;
     readonly Vehicle vehicle;
-    bool addMode = false, editMode = false, changes = false, isParentMain = true;
+    bool addMode = false, editMode = false, changes = false, isParentMain = true, online = false;
     List<Control> fields;
 
     public ServicesWindow( Services services, Vehicle vehicle, bool isParentMain = true )
@@ -265,9 +265,19 @@ namespace A2
     {
       if (lvItems.SelectedItem is Service)
       {
-        if ( ! editMode)
+        if (online)
         {
-          ToggleEditMode(true);
+          if (!editMode)
+          {
+            ToggleEditMode(true);
+          }
+        }
+        else
+        {
+          foreach (Control field in fields)
+          {
+            field.IsEnabled = false;
+          }
         }
 
         selected = ( Service ) lvItems.SelectedItem;
@@ -278,8 +288,13 @@ namespace A2
     private void Window_Loaded( object sender, RoutedEventArgs e )
     {
       Refresh();
-      ToggleAddMode( false );
-      ToggleEditMode( false );
+
+      online = Owner is MainWindow ? ((MainWindow)Owner).Online : ((VehicleWindow)Owner).Online;
+
+      ToggleAddMode(false);
+      ToggleEditMode(false);
+
+      btnAdd.IsEnabled = online ? true : false;
     }
 
     private void Window_Closing( object sender, CancelEventArgs e )

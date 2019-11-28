@@ -1,6 +1,8 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,36 +23,102 @@ namespace A2
   /// </summary>
   public partial class MainWindow : Window
   {
-    public Vehicles Vehicles = new Vehicles();
-    public Journeys Journeys = new Journeys();
-    public Services Services = new Services();
-    public FuelPurchases FuelPurchases = new FuelPurchases();
+    public Vehicles Vehicles;
+    public Journeys Journeys;
+    public Services Services;
+    public FuelPurchases FuelPurchases;
+    public Database Database;
 
     Vehicle selectedVehicle;
+
+    public bool Online = false;
 
     public MainWindow()
     {
       InitializeComponent();
-      DataContext = Vehicles;
       SetVehiclePropertyButtons( false );
 
       // Set default state to btnView to prevent view from receiving a null value;
       btnView.IsEnabled = false;
 
-      // Seed
-      Vehicles.Add("BMW", "X5", 2006, "1BGZ784", 93, 50 );
-      Vehicles.Add("Tesla", "Roadster", 2008, "8HDZ576", 0);
-      Vehicles.Add("Chevrolet", "Cadillac", 1959, "C4D1LL4C", 79);
+      // Instantiate collections
+      Vehicles = new Vehicles();
+      Journeys = new Journeys();
+      Services = new Services();
+      FuelPurchases = new FuelPurchases();
 
-      Journeys.Add( Vehicles.List[0], new DateTime(2019, 1, 15, 15, 45, 00), 10 );
-      Journeys.Add( Vehicles.List[0], new DateTime(2019, 3, 16, 21, 10, 00), 20 );
-      Journeys.Add( Vehicles.List[2], new DateTime(2019, 11, 19, 18, 10, 00), 30 );
+      // Test database connection
+      if ( InstantiateDatabase() )
+      {
+        Online = true;
 
-      FuelPurchases.Add( Vehicles.List[0], 357.11m, 39.23, new DateTime(2019, 11, 18, 22, 15, 00));
-      FuelPurchases.Add( Vehicles.List[0], 161.80m, 49.57, new DateTime(2019, 11, 21, 12, 15, 00));
+        tbStatus.Text = "Connected to database (yay!)";
+        tbStatus.Foreground = Brushes.DarkGreen;
 
-      Services.Add( Vehicles.List[0], 10, 473.02m, new DateTime(2018, 12, 20) );
-      Services.Add( Vehicles.List[0], 15, 537.20m, new DateTime(2019, 3, 16) );
+        // Load collections, query from database and store values.
+        LoadCollections();
+      }
+      else
+      {
+        // Load collections from stored JSON (if any)
+        GoOffline();
+      }
+    }
+
+    /// <summary>
+    /// Instantiates connection to the database and tests it
+    /// </summary>
+    /// <returns>True if successful, false otherwise.</returns>
+    private bool InstantiateDatabase()
+    {
+      Database = new Database("nmt_fleet_manager", "nmt_fleet_manager", "Fleet2019S2");
+
+      if ( Database.LastException != null )
+      {
+        return false;
+      }
+
+      return true;
+    }
+
+    /// <summary>
+    /// Run necessary routine to initiate offline mode
+    /// </summary>
+    private void GoOffline()
+    {
+      MessageBox.Show(
+        "Could not connect to database. Will use last data retrieved instead with viewing capabilities only.",
+        "Database Error",
+        MessageBoxButton.OK,
+        MessageBoxImage.Exclamation
+      );
+
+      // Load data resources into collections
+      Vehicles.Load(new Offline());
+
+      Journeys.Load(Vehicles.List, new Offline());
+      Services.Load(Vehicles.List, new Offline());
+      FuelPurchases.Load(Vehicles.List, new Offline());
+
+      btnAdd.IsEnabled = false;
+      tbStatus.Text = "Offline Mode: View Only";
+      tbStatus.Foreground = Brushes.Red;
+
+      DataContext = Vehicles;
+    }
+
+    /// <summary>
+    /// Passes database resources and backup offline mode to collections.
+    /// </summary>
+    private void LoadCollections()
+    {
+      Vehicles.Load(new Offline(), Database);
+
+      Journeys.Load(Vehicles.List, new Offline(), Database);
+      Services.Load(Vehicles.List, new Offline(), Database);
+      FuelPurchases.Load(Vehicles.List, new Offline(), Database);
+
+      DataContext = Vehicles;
     }
 
     /// <summary>
@@ -62,6 +130,7 @@ namespace A2
 
       if (lvVehicles.SelectedItem is Vehicle)
       {
+        // Set selected vehicle in the list and propagate context to groupboxes.
         selectedVehicle = (Vehicle)lvVehicles.SelectedItem;
         CollectionViewSource.GetDefaultView(lvVehicles.ItemsSource).Refresh();
 
@@ -70,8 +139,15 @@ namespace A2
         ObservableCollection<FuelPurchase> fuelPurchases = FuelPurchases.ByVehicle(selectedVehicle);
 
         gbVehicle.DataContext = selectedVehicle;
+        
+        // Consequence of not having MVVM: have to null DataContext and assign the expected DataContext for changes to mitigate
+        gbJourney.DataContext = null;
         gbJourney.DataContext = journeys.Count > 0 ? journeys[0] : null;
+
+        gbRecentService.DataContext = null;
         gbRecentService.DataContext = services.Count > 0 ? services[0] : null;
+
+        gbFuelPurchase.DataContext = null;
         gbFuelPurchase.DataContext = fuelPurchases.Count > 0 ? fuelPurchases[0] : null;
 
         selectedVehicleOdometer = Vehicles.TotalDistance(journeys).ToString();
@@ -147,13 +223,41 @@ namespace A2
 
     private void BtnAdd_Click( object sender, RoutedEventArgs e )
     {
-      VehicleWindow vehicleWindow = new VehicleWindow(Journeys, FuelPurchases, Services, true)
+      if ( Online )
       {
-        Owner = this,
-        DataContext = new Vehicle( Vehicles.FindId() )
-      };
+        VehicleWindow vehicleWindow = new VehicleWindow(Journeys, FuelPurchases, Services, true)
+        {
+          Owner = this,
+          DataContext = new Vehicle(Vehicles.FindId())
+        };
 
-      vehicleWindow.ShowDialog();
+        vehicleWindow.ShowDialog();
+      } else
+      {
+        MessageBox.Show("Limited 'View Only' Capabilities on Offline Mode");
+      }
+    }
+
+    private void Window_Closed( object sender, EventArgs e )
+    {
+      // Try closing database connections (if any)
+      try
+      {
+        Database.Close();
+      }
+      catch ( Exception )
+      {
+        // TODO: Nothing
+      }
+      finally
+      {
+        // Always save current state to offline storage.
+        Vehicles.SaveOffline();
+        
+        FuelPurchases.SaveOffline();
+        Journeys.SaveOffline();
+        Services.SaveOffline();
+      }
     }
   }
 }

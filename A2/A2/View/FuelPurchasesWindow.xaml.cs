@@ -25,7 +25,7 @@ namespace A2
     ObservableCollection<FuelPurchase> filtered;
     FuelPurchase selected;
     readonly Vehicle vehicle;
-    bool addMode = false, editMode = false, changes = false, isParentMain = true;
+    bool addMode = false, editMode = false, changes = false, isParentMain = true, online = false;
     List<Control> fields;
 
     public FuelPurchasesWindow( FuelPurchases fuelPurchases, Vehicle vehicle, bool isParentMain = true )
@@ -188,9 +188,18 @@ namespace A2
     {
       if (lvItems.SelectedItem is FuelPurchase)
       {
-        if ( ! editMode)
+        if ( online )
         {
-          ToggleEditMode(true);
+          if (!editMode)
+          {
+            ToggleEditMode(true);
+          }
+        }
+        else {
+          foreach ( Control field in fields )
+          {
+            field.IsEnabled = false;
+          }
         }
 
         selected = (FuelPurchase)lvItems.SelectedItem;
@@ -264,6 +273,18 @@ namespace A2
       Refresh();
       changes = true;
     }
+    
+    private void Window_Loaded( object sender, RoutedEventArgs e )
+    {
+      Refresh();
+
+      online = Owner is MainWindow ? ((MainWindow)Owner).Online : ((VehicleWindow)Owner).Online;
+
+      ToggleAddMode( false );
+      ToggleEditMode( false );
+
+      btnAdd.IsEnabled = online ? true : false;
+    }
 
     private void Window_Closing( object sender, CancelEventArgs e )
     {
@@ -276,16 +297,9 @@ namespace A2
         }
         else
         {
-          ((VehicleWindow)Owner).Refresh( true );
+          ((VehicleWindow)Owner).Refresh(true);
         }
       }
-    }
-    
-    private void Window_Loaded( object sender, RoutedEventArgs e )
-    {
-      Refresh();
-      ToggleAddMode( false );
-      ToggleEditMode( false );
     }
   }
 }
