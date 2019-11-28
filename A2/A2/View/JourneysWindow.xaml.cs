@@ -24,7 +24,7 @@ namespace A2
     ObservableCollection<Journey> filteredJourneys;
     Journey selected;
     readonly Vehicle vehicle;
-    bool addMode = false, editMode = false, changes = false, isParentMain = true;
+    bool addMode = false, editMode = false, changes = false, isParentMain = true, online = false;
     List<Control> fields;
 
     public JourneysWindow( Journeys journeys, Vehicle vehicle, bool isParentMain = true )
@@ -180,9 +180,19 @@ namespace A2
     {
       if ( lvJourneys.SelectedItem is Journey )
       {
-        if ( ! editMode )
+        if (online)
         {
-          ToggleEditMode( true );
+          if (!editMode)
+          {
+            ToggleEditMode(true);
+          }
+        }
+        else
+        {
+          foreach (Control field in fields)
+          {
+            field.IsEnabled = false;
+          }
         }
 
         selected = ( Journey ) lvJourneys.SelectedItem;
@@ -258,8 +268,13 @@ namespace A2
     private void Window_Loaded( object sender, RoutedEventArgs e )
     {
       Refresh();
+
+      online = Owner is MainWindow ? ((MainWindow)Owner).Online : ((VehicleWindow)Owner).Online;
+
       ToggleAddMode(false);
       ToggleEditMode(false);
+
+      btnAdd.IsEnabled = online ? true : false;
     }
 
     private void Window_Closing( object sender, System.ComponentModel.CancelEventArgs e )

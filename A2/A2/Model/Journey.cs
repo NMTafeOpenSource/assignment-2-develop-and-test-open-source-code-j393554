@@ -29,6 +29,11 @@ namespace A2
 
     public int Distance { get; set; }
 
+    /// <summary>
+    /// Journey class for a vehicle. Requires an Id and a Vehicle class as arguments.
+    /// </summary>
+    /// <param name="id">Id to use for this Journey</param>
+    /// <param name="vehicle">Vehicle to be used on this Journey and to be displayed in VehicleId</param>
     public Journey( int id, Vehicle vehicle )
     {
       this.vehicle = vehicle;

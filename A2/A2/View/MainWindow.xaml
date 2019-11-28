@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:A2"
         mc:Ignorable="d"
-        Title="Car Rental Management System" Height="450" Width="800">
+        Title="Car Rental Management System" Height="450" Width="1000" Closed="Window_Closed">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
             <ColumnDefinition/>
             <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition/>
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -31,8 +31,8 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Manufacturer" DisplayMemberBinding="{Binding Manufacturer}" Width="80" />
-                    <GridViewColumn Header="Model" DisplayMemberBinding="{Binding Model}" Width="80" />
-                    <GridViewColumn Header="Registration" DisplayMemberBinding="{Binding RegistrationNumber}" Width="80" />
+                    <GridViewColumn Header="Model" DisplayMemberBinding="{Binding Model}" Width="150" />
+                    <GridViewColumn Header="Registration" DisplayMemberBinding="{Binding RegistrationNumber}" Width="100" />
                 </GridView>
             </ListView.View>
         </ListView>
@@ -131,5 +131,6 @@
         
         <Button x:Name="btnAdd" Content="Add Vehicle" HorizontalAlignment="Left" Grid.Row="9" VerticalAlignment="Center" Width="75" Grid.Column="1" Click="BtnAdd_Click"/>
         <Button x:Name="btnView" Content="View Vehicle" HorizontalAlignment="Left" Grid.Row="9" VerticalAlignment="Center" Width="75" Grid.Column="1" Margin="80,0,0,0" Click="BtnView_Click"/>
+        <TextBlock x:Name="tbStatus" Grid.Column="1" HorizontalAlignment="Right" Margin="10" Grid.Row="9" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Center"/>
     </Grid>
 </Window>

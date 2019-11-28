@@ -26,7 +26,7 @@
                 <GridView>
                     <GridViewColumn Header="Date" Width="80" DisplayMemberBinding="{Binding Date, StringFormat='dd/MM/yyyy'}" />
                     <GridViewColumn Header="Odometer" Width="80" DisplayMemberBinding="{Binding Odometer}" />
-                    <GridViewColumn Header="Cost" Width="80" DisplayMemberBinding="{Binding Cost}" />
+                    <GridViewColumn Header="Cost" Width="80" DisplayMemberBinding="{Binding Cost, StringFormat=N2}" />
                 </GridView>
             </ListView.View>
         </ListView>
